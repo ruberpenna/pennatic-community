@@ -1,0 +1,129 @@
+<link rel="stylesheet" type="text/css" href="../bootstrap/css/bootstrap.css">
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css" />
+<script type="text/javascript" src="../js/jquery-2.1.3.min.js"></script>
+<script type="text/javascript" src="../bootstrap/js/bootstrap.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+
+<?php
+include("../dbconfig.php");
+error_reporting(E_ALL);
+ini_set("display_errors", 1);
+
+session_start();
+if(!isset($_SESSION['mem_id'])){
+	echo "<script>
+        $(window).load(function(){
+          $(document).ready(function () {
+            swal({
+              title: '로그인이 필요합니다.',
+              type: 'info',
+              confirmButtonClass: 'btn-primary',
+              confirmButtonText: '확인',
+            },
+            function(isConfirm) {
+              if (isConfirm) {
+               history.back();
+              }
+            });
+          });
+        });
+      </script>";
+  exit;
+}
+
+if($_SESSION['mem_status'] != 2){
+	echo "<script>
+        $(window).load(function(){
+          $(document).ready(function () {
+            swal({
+              title: '운영자만 접근이 가능합니다.',
+              type: 'info',
+              confirmButtonClass: 'btn-primary',
+              confirmButtonText: '확인',
+            },
+            function(isConfirm) {
+              if (isConfirm) {
+               history.back();
+              }
+            });
+          });
+        });
+      </script>";
+  exit;
+}
+
+if(!isset($_GET['mem_idx'])){
+	echo "<script>
+        $(window).load(function(){
+          $(document).ready(function () {
+            swal({
+              title: '복구하려는 회원번호가 존재하지 않습니다.',
+              type: 'info',
+              confirmButtonClass: 'btn-primary',
+              confirmButtonText: '확인',
+            },
+            function(isConfirm) {
+              if (isConfirm) {
+               history.back();
+              }
+            });
+          });
+        });
+      </script>";
+  exit;
+}
+
+$mem_idx = $_GET['mem_idx'];
+$page = $_GET['page'];
+
+try{
+	$pdo = new PDO($dsn, $dbUser, $dbPwd);
+  $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+  //$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMORE_EXCEPTION);
+
+  $sql = "UPDATE tbl_member set mem_status = 1 WHERE mem_idx = '$mem_idx' AND mem_status = 0";
+	$stm = $pdo->prepare($sql);
+	$stm->execute();
+
+
+	echo "<script>
+        $(window).load(function(){
+          $(document).ready(function () {
+            swal({
+              title: '탈퇴 회원 복구에 성공하였습니다.',
+              type: 'success',
+              confirmButtonClass: 'btn-success',
+              confirmButtonText: '확인',
+            },
+            function(isConfirm) {
+              if (isConfirm) {
+               location.href='admin_member.php?page=".$page."';
+              }
+            });
+          });
+        });
+      </script>";
+
+} catch (Exception $e){
+	echo "<script>
+        $(window).load(function(){
+          $(document).ready(function () {
+            swal({
+              title: '데이터베이스에 문제가 발생했습니다. 관리자에게 문의하세요.',
+              type: 'info',
+              confirmButtonClass: 'btn-primary',
+              confirmButtonText: '확인',
+            },
+            function(isConfirm) {
+              if (isConfirm) {
+               history.back();
+              }
+            });
+          });
+        });
+      </script>";
+  echo $e->getMessage();
+  exit();
+}
+
+?>
