@@ -4,7 +4,7 @@
 
 ```
 인터넷 → Cloudflare → 공유기(80/443) → Nginx Proxy Manager(HTTPS, 192.168.0.33)
-       → nginx(이 PC 192.168.0.24:8124) → php-cgi 2개(127.0.0.1:9101, 9102)
+       → nginx(이 PC 192.168.0.24:8765) → php-cgi 2개(127.0.0.1:9101, 9102)
        → MySQL(192.168.0.27, DB penna)
 ```
 
@@ -31,7 +31,7 @@ G:\penna\deploy\update.bat
 ## 도메인 연결 (NPM)
 
 1. NPM에서 Proxy Host 추가
-   - Domain: 사이트 도메인 / Scheme: `http` / Forward IP: `192.168.0.24` / Port: `8124`
+   - Domain: 사이트 도메인 / Scheme: `http` / Forward IP: `192.168.0.24` / Port: `8765`
    - Websockets Support는 꺼도 됩니다.
    - SSL 탭: Let's Encrypt 발급, Force SSL 켜기
    - Advanced 탭: 아래 내용 (첨부파일 업로드 크기, Cloudflare 뒤의 실제 방문자 IP)

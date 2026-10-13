@@ -1,13 +1,14 @@
 # Registers Penna's Windows services (run once, in an elevated PowerShell).
 #   penna-php-1, penna-php-2 : php-cgi FastCGI workers on 127.0.0.1:9101/9102
-#   penna-nginx              : nginx on :8124 (Nginx Proxy Manager forwards the domain here)
+#   penna-nginx              : nginx on :8765 (Nginx Proxy Manager forwards the domain here)
 # Re-running is safe: existing services are updated, not duplicated.
 
 param(
     [string]$AppDir = 'G:\penna',
     [string]$PhpDir = 'G:\php\php-8.4.26',
     [string]$NginxDir = 'G:\nginx\nginx-1.29.1',
-    [string]$ProxyIp = '192.168.0.33'
+    [string]$ProxyIp = '192.168.0.33',
+    [int]$Port = 8765
 )
 
 $ErrorActionPreference = 'Stop'
@@ -48,7 +49,8 @@ function Install-PennaService([string]$Name, [string]$Exe, [string]$Arguments, [
 # nginx config (keep the original once)
 $conf = Join-Path $NginxDir 'conf\nginx.conf'
 if (-not (Test-Path "$conf.orig")) { Copy-Item $conf "$conf.orig" }
-Copy-Item (Join-Path $AppDir 'deploy\nginx.conf') $conf -Force
+$template = Get-Content (Join-Path $AppDir 'deploy\nginx.conf') -Raw
+[IO.File]::WriteAllText($conf, ($template -replace 'listen\s+\d+;', "listen       $Port;"))
 
 # php-cgi exits after PHP_FCGI_MAX_REQUESTS requests and NSSM restarts it, which bounds memory growth.
 foreach ($port in 9101, 9102) {
@@ -59,11 +61,9 @@ foreach ($port in 9101, 9102) {
 & (Join-Path $NginxDir 'nginx.exe') -t -p $NginxDir
 Install-PennaService 'penna-nginx' (Join-Path $NginxDir 'nginx.exe') '' $NginxDir
 
-# Only Nginx Proxy Manager needs to reach port 8124.
-$rule = 'Penna 8124'
-if (Get-NetFirewallRule -DisplayName $rule -ErrorAction SilentlyContinue) {
-    Set-NetFirewallRule -DisplayName $rule -RemoteAddress $ProxyIp
-} else {
-    New-NetFirewallRule -DisplayName $rule -Direction Inbound -Protocol TCP -LocalPort 8124 -RemoteAddress $ProxyIp -Action Allow | Out-Null
-}
-Write-Host "firewall: $rule allows $ProxyIp"
+# Only Nginx Proxy Manager needs to reach the web port.
+Get-NetFirewallRule -DisplayName 'Penna 8124' -ErrorAction SilentlyContinue | Remove-NetFirewallRule
+$rule = 'Penna web'
+Get-NetFirewallRule -DisplayName $rule -ErrorAction SilentlyContinue | Remove-NetFirewallRule
+New-NetFirewallRule -DisplayName $rule -Direction Inbound -Protocol TCP -LocalPort $Port -RemoteAddress $ProxyIp -Action Allow | Out-Null
+Write-Host "firewall: $rule allows $ProxyIp to port $Port"
