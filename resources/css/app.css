@@ -100,3 +100,27 @@ trix-editor.post-content {
 .dark trix-toolbar .trix-button.trix-active {
     @apply bg-zinc-500;
 }
+
+[x-cloak] {
+    display: none !important;
+}
+
+/* Desktop sidebar hide/show (see components/sidebar-toggle). The sidebar is w-64 (16rem). */
+.sidebar-toggle {
+    left: calc(16rem - 0.875rem);
+}
+
+@media (min-width: 64rem) {
+    .sidebar-hidden [data-flux-sidebar] {
+        display: none;
+    }
+
+    .sidebar-hidden .sidebar-toggle {
+        left: 0.5rem;
+    }
+
+    /* Keep content clear of the floating show button. */
+    .sidebar-hidden [data-flux-main] {
+        padding-inline-start: 3rem;
+    }
+}
