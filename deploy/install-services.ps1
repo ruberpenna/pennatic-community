@@ -53,9 +53,10 @@ $template = Get-Content (Join-Path $AppDir 'deploy\nginx.conf') -Raw
 [IO.File]::WriteAllText($conf, ($template -replace 'listen\s+\d+;', "listen       $Port;"))
 
 # php-cgi exits after PHP_FCGI_MAX_REQUESTS requests and NSSM restarts it, which bounds memory growth.
-foreach ($port in 9101, 9102) {
-    $name = "penna-php-$($port - 9100)"
-    Install-PennaService $name (Join-Path $PhpDir 'php-cgi.exe') "-b 127.0.0.1:$port" $AppDir @('PHP_FCGI_MAX_REQUESTS=1000')
+# (PowerShell variable names are case-insensitive, so don't reuse $Port here.)
+foreach ($workerPort in 9101, 9102) {
+    $name = "penna-php-$($workerPort - 9100)"
+    Install-PennaService $name (Join-Path $PhpDir 'php-cgi.exe') "-b 127.0.0.1:$workerPort" $AppDir @('PHP_FCGI_MAX_REQUESTS=1000')
 }
 
 & (Join-Path $NginxDir 'nginx.exe') -t -p $NginxDir
