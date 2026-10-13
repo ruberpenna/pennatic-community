@@ -46,7 +46,7 @@ new class extends Component {
             <flux:callout variant="warning" icon="exclamation-triangle" class="mt-6" :heading="__('Please change your password before continuing.')" />
         @endif
 
-        <form wire:submit="updatePassword" class="mt-6 space-y-6">
+        <form method="post" wire:submit="updatePassword" class="mt-6 space-y-6">
             <flux:input
                 wire:model="current_password"
                 id="update_password_current_passwordpassword"

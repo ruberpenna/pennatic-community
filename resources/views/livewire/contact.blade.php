@@ -75,7 +75,7 @@ new class extends Component {
         <flux:callout variant="success" icon="check-circle" :heading="session('status')" />
     @endif
 
-    <form wire:submit="send" class="flex flex-col gap-6">
+    <form method="post" wire:submit="send" class="flex flex-col gap-6">
         <flux:input wire:model="title" :label="__('Title')" maxlength="90" required />
         <flux:textarea wire:model="content" :label="__('Content')" rows="8" maxlength="5000" required />
         <div class="flex justify-end">

@@ -127,7 +127,7 @@ new class extends Component {
     {{ $memos->links() }}
 
     <flux:modal name="memo-form" class="w-full max-w-lg">
-        <form wire:submit="save" class="flex flex-col gap-6">
+        <form method="post" wire:submit="save" class="flex flex-col gap-6">
             <flux:heading size="lg">{{ $editingId ? __('Edit memo') : __('New memo') }}</flux:heading>
             <flux:input wire:model="title" :label="__('Title')" maxlength="100" />
             <flux:textarea wire:model="content" :label="__('Content')" rows="8" maxlength="10000" />

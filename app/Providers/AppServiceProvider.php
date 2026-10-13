@@ -6,6 +6,7 @@ use App\Models\Board;
 use App\Models\BoardFolder;
 use App\Models\Message;
 use App\Models\Post;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -24,6 +25,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Cloudflare reaches the proxy over plain HTTP, so the forwarded scheme says "http";
+        // generate https URLs (Livewire update endpoint, redirects) whenever the site is configured for https.
+        if (str_starts_with(config('app.url'), 'https://')) {
+            URL::forceScheme('https');
+        }
+
         View::composer('components.layouts.app.sidebar', function ($view) {
             $view->with([
                 'boardFolders' => BoardFolder::with('boards')->orderBy('sort_order')->orderBy('id')->get(),

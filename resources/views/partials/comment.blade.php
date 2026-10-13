@@ -13,7 +13,7 @@
         </div>
 
         @if ($editingId === $comment->id)
-            <form wire:submit="update" class="flex flex-col gap-2">
+            <form method="post" wire:submit="update" class="flex flex-col gap-2">
                 <flux:textarea wire:model="editContent" rows="2" :maxlength="1000" :aria-label="__('Comment')" />
                 <div class="flex justify-end gap-2">
                     <flux:button size="sm" variant="ghost" wire:click="$set('editingId', null)">{{ __('Cancel') }}</flux:button>

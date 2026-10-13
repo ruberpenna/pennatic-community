@@ -1,5 +1,5 @@
 {{-- Shared by posts.create and posts.edit; expects $form (PostForm) and $existingAttachments. --}}
-<form wire:submit="save" class="flex flex-col gap-6">
+<form method="post" wire:submit="save" class="flex flex-col gap-6">
     @if ($form->board->subjects)
         <flux:select wire:model="form.subject" :label="__('Subject')">
             <flux:select.option value="">{{ __('None') }}</flux:select.option>

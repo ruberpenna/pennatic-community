@@ -181,7 +181,7 @@ new class extends Component {
                 @endif
 
                 @if ($replyTo !== null && ($replyTo === $comment->id || $replies->get($comment->id)?->contains('id', $replyTo)))
-                    <form wire:submit="reply" class="mt-3 flex flex-col gap-2 ps-4">
+                    <form method="post" wire:submit="reply" class="mt-3 flex flex-col gap-2 ps-4">
                         <flux:textarea wire:model="replyContent" rows="2" :maxlength="1000" :placeholder="__('Write a reply')" :aria-label="__('Reply')" />
                         <div class="flex justify-end gap-2">
                             <flux:button size="sm" variant="ghost" wire:click="$set('replyTo', null)">{{ __('Cancel') }}</flux:button>
@@ -196,7 +196,7 @@ new class extends Component {
     </ul>
 
     @auth
-        <form wire:submit="add" class="flex flex-col gap-2">
+        <form method="post" wire:submit="add" class="flex flex-col gap-2">
             <flux:textarea wire:model="content" rows="3" :maxlength="1000" :placeholder="__('Write a comment')" :aria-label="__('Comment')" />
             <div class="flex justify-end">
                 <flux:button type="submit" variant="primary">{{ __('Post comment') }}</flux:button>

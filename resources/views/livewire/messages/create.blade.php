@@ -81,7 +81,7 @@ new class extends Component {
 <div class="flex max-w-3xl flex-col gap-6">
     <flux:heading size="xl" level="1">{{ __('New message') }}</flux:heading>
 
-    <form wire:submit="send" class="flex flex-col gap-6">
+    <form method="post" wire:submit="send" class="flex flex-col gap-6">
         <flux:input wire:model="recipient" :label="__('Recipient')" :description="__('Enter the nickname of the member.')" required />
         <flux:input wire:model="title" :label="__('Title')" maxlength="100" required />
         <flux:textarea wire:model="content" :label="__('Content')" rows="8" maxlength="5000" required />

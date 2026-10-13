@@ -113,7 +113,7 @@ new class extends Component {
     @include('partials.settings-heading')
 
     <x-settings.layout :heading="__('Profile')" :subheading="__('Update your name and email address')">
-        <form wire:submit="updateProfileInformation" class="my-6 w-full space-y-6">
+        <form method="post" wire:submit="updateProfileInformation" class="my-6 w-full space-y-6">
             <div class="flex items-center gap-4">
                 <flux:avatar size="xl" :src="$avatar?->isPreviewable() ? $avatar->temporaryUrl() : auth()->user()->avatarUrl()" :initials="auth()->user()->initials()" />
 
