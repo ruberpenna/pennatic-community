@@ -11,6 +11,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // HTTPS ends at Nginx Proxy Manager on the LAN, which forwards to this PC over HTTP.
+        // Trust only that host, so visitors cannot spoof X-Forwarded-* headers.
+        $middleware->trustProxies(at: ['192.168.0.33']);
+
         $middleware->web(append: [
             \App\Http\Middleware\EnsurePasswordIsChanged::class,
         ]);
