@@ -16,6 +16,6 @@ class AttachmentController extends Controller
 
         $attachment->newQuery()->whereKey($attachment->id)->increment('download_count');
 
-        return Storage::disk('local')->download($attachment->path, $attachment->original_name);
+        return $attachment->download();
     }
 }

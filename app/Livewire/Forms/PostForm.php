@@ -7,7 +7,6 @@ use App\Models\Post;
 use App\Models\User;
 use App\Support\PostContent;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Livewire\Form;
@@ -127,9 +126,8 @@ class PostForm extends Form
         DB::transaction(function () use ($attributes) {
             $this->post->update($attributes);
 
-            $removed = $this->post->attachments()->whereIn('id', $this->removedAttachmentIds)->get();
-            Storage::disk('local')->delete($removed->pluck('path')->all());
-            $this->post->attachments()->whereKey($removed->modelKeys())->delete();
+            // Deleting each model also removes its file.
+            $this->post->attachments()->whereIn('id', $this->removedAttachmentIds)->get()->each->delete();
 
             $this->storeUploads($this->post);
         });

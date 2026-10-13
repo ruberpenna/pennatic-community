@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class Attachment extends Model
 {
@@ -26,6 +28,16 @@ class Attachment extends Model
             'size' => 'integer',
             'download_count' => 'integer',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::deleted(fn (Attachment $attachment) => Storage::disk('local')->delete($attachment->path));
+    }
+
+    public function download(): StreamedResponse
+    {
+        return Storage::disk('local')->download($this->path, $this->original_name);
     }
 
     /**

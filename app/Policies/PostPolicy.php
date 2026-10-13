@@ -7,6 +7,14 @@ use App\Models\User;
 
 class PostPolicy
 {
+    /**
+     * Admins may moderate everything (including in the admin panel); voting follows the normal rule.
+     */
+    public function before(User $user, string $ability): ?bool
+    {
+        return $user->isAdmin() && $ability !== 'vote' ? true : null;
+    }
+
     public function create(User $user): bool
     {
         return true;

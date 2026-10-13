@@ -39,6 +39,12 @@ class Post extends Model
         ];
     }
 
+    protected static function booted(): void
+    {
+        // Attachment rows go with the post via the foreign key; remove their files too.
+        static::forceDeleting(fn (Post $post) => $post->attachments->each->delete());
+    }
+
     /**
      * Store an uploaded file privately and attach it to this post.
      */

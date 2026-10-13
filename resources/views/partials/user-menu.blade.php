@@ -17,6 +17,9 @@
     <flux:menu.radio.group>
         <flux:menu.item :href="route('my.activity')" icon="document-text" wire:navigate>{{ __('My activity') }}</flux:menu.item>
         <flux:menu.item :href="route('settings.profile')" icon="cog" wire:navigate>{{ __('Settings') }}</flux:menu.item>
+        @if (auth()->user()->isAdmin())
+            <flux:menu.item href="/admin" icon="shield-check">{{ __('Admin') }}</flux:menu.item>
+        @endif
     </flux:menu.radio.group>
 
     <flux:menu.separator />
