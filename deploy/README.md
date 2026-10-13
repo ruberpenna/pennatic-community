@@ -80,3 +80,24 @@ G:\penna\deploy\update.bat
    ```
 
 메일 발송이 실패해도 가입은 완료되고, 회원은 인증 화면에서 메일을 다시 받을 수 있습니다. 실패 기록은 `storage\logs`에 남습니다.
+
+## DB 자동 백업
+
+매일 04:30에 작업 스케줄러(`penna-backup`, SYSTEM 계정)가 `deploy\backup.ps1`을 실행합니다.
+
+| 항목 | 내용 |
+|---|---|
+| DB | `G:\penna_backups\db\penna_날짜_시간.sql.gz` (30일 보관, 최소 최근 7개는 항상 유지) |
+| 업로드 파일 | `G:\penna_backups\files\private`(첨부파일), `files\public`(프로필·본문 이미지) — 바뀐 파일만 복사 |
+| 두 번째 사본 | `D:\OneDrive\DEV\penna_backup\auto` (다른 디스크 + OneDrive 동기화) |
+| 기록 | `G:\penna\storage\logs\backup.log` |
+
+- 작업 등록(처음 한 번, 관리자 PowerShell): `powershell -ExecutionPolicy Bypass -File G:\penna\deploy\register-backup-task.ps1`
+- 바로 백업: `powershell -ExecutionPolicy Bypass -File G:\penna\deploy\backup.ps1`
+
+### 복원
+
+1. `php artisan down`
+2. DB: `php artisan db:restore-sql G:\penna_backups\db\penna_….sql.gz` (백업에 있는 테이블을 모두 교체합니다)
+3. 파일: `G:\penna_backups\files\private`, `files\public`을 `G:\penna\storage\app\` 아래로 복사
+4. `php artisan up`
