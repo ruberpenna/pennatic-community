@@ -447,6 +447,7 @@
     "The response is not a streamed response.": "응답이 스트리밍 응답이 아닙니다.",
     "The response is not a view.": "응답은 보기가 아닙니다.",
     "The team name does not match.": "The team name does not match.",
+    "Theme": "화면 테마",
     "There is no admin to receive inquiries right now.": "지금은 문의를 받을 운영자가 없습니다.",
     "This action cannot be undone. This will permanently delete the team \":name\".": "This action cannot be undone. This will permanently delete the team \":name\".",
     "This action is unauthorized.": "이 작업은 승인되지 않았습니다.",

@@ -27,7 +27,7 @@ new class extends Component {
     <ul class="divide-y divide-zinc-200 dark:divide-zinc-700">
         @forelse ($notices as $notice)
             <li class="flex justify-between gap-4 py-3">
-                <a href="{{ route('notices.show', $notice) }}" class="truncate hover:underline" wire:navigate>{{ $notice->title }}</a>
+                <a href="{{ route('notices.show', $notice) }}" class="min-w-0 truncate hover:underline" wire:navigate>{{ $notice->title }}</a>
                 <time class="shrink-0 text-sm text-zinc-500" datetime="{{ $notice->created_at->toDateString() }}">{{ $notice->created_at->format('Y.m.d') }}</time>
             </li>
         @empty

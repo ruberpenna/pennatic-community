@@ -32,7 +32,7 @@ new class extends Component {
     @endguest
 
     @if ($notices->isNotEmpty())
-        <section class="flex flex-col gap-2">
+        <section class="flex min-w-0 flex-col gap-2">
             <div class="flex items-center justify-between">
                 <flux:heading size="lg">
                     <a href="{{ route('notices.index') }}" wire:navigate>{{ __('Notices') }}</a>
@@ -42,7 +42,7 @@ new class extends Component {
             <ul class="divide-y divide-zinc-200 text-sm dark:divide-zinc-700">
                 @foreach ($notices as $notice)
                     <li class="flex justify-between gap-4 py-2">
-                        <a href="{{ route('notices.show', $notice) }}" class="truncate hover:underline" wire:navigate>{{ $notice->title }}</a>
+                        <a href="{{ route('notices.show', $notice) }}" class="min-w-0 truncate hover:underline" wire:navigate>{{ $notice->title }}</a>
                         <time class="shrink-0 text-zinc-500" datetime="{{ $notice->created_at->toDateString() }}">
                             {{ $notice->created_at->format('Y.m.d') }}
                         </time>
@@ -54,7 +54,7 @@ new class extends Component {
 
     <div class="grid gap-8 md:grid-cols-2">
         @foreach ($boards as $board)
-            <section class="flex flex-col gap-2">
+            <section class="flex min-w-0 flex-col gap-2">
                 <div class="flex items-center justify-between">
                     <flux:heading size="lg">
                         <a href="{{ route('boards.show', $board) }}" wire:navigate>{{ $board->name }}</a>
@@ -65,7 +65,7 @@ new class extends Component {
                 <ul class="divide-y divide-zinc-200 text-sm dark:divide-zinc-700">
                     @forelse ($board->posts as $post)
                         <li class="flex justify-between gap-4 py-2">
-                            <a href="{{ route('posts.show', $post) }}" class="truncate hover:underline" wire:navigate>
+                            <a href="{{ route('posts.show', $post) }}" class="min-w-0 truncate hover:underline" wire:navigate>
                                 {{ $post->title }}
                                 @if ($post->comments_count)
                                     <span class="text-zinc-500">[{{ $post->comments_count }}]</span>

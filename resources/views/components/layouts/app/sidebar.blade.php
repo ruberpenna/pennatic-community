@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         @include('partials.head')
     </head>
@@ -50,6 +50,8 @@
 
             <flux:spacer />
 
+            <x-theme-toggle class="max-lg:hidden" />
+
             @auth
                 <!-- Desktop User Menu -->
                 <flux:dropdown position="bottom" align="start">
@@ -75,6 +77,8 @@
             <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
 
             <flux:spacer />
+
+            <x-theme-toggle class="me-2" />
 
             @auth
                 <flux:dropdown position="top" align="end">
