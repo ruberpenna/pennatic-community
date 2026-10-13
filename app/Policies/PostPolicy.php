@@ -22,6 +22,11 @@ class PostPolicy
         return $user->id === $post->user_id || $user->isAdmin();
     }
 
+    public function vote(User $user, Post $post): bool
+    {
+        return $user->id !== $post->user_id;
+    }
+
     public function pin(User $user, Post $post): bool
     {
         return $user->isAdmin();

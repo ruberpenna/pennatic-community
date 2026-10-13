@@ -13,6 +13,7 @@
 
             <flux:navlist variant="outline">
                 <flux:navlist.item icon="home" :href="route('home')" :current="request()->routeIs('home')" wire:navigate>{{ __('Home') }}</flux:navlist.item>
+                <flux:navlist.item icon="megaphone" :href="route('notices.index')" :current="request()->routeIs('notices.*')" wire:navigate>{{ __('Notices') }}</flux:navlist.item>
 
                 @foreach ($boardFolders as $folder)
                     @continue($folder->boards->isEmpty())

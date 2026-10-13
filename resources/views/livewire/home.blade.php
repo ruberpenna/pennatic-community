@@ -33,11 +33,16 @@ new class extends Component {
 
     @if ($notices->isNotEmpty())
         <section class="flex flex-col gap-2">
-            <flux:heading size="lg">{{ __('Notices') }}</flux:heading>
+            <div class="flex items-center justify-between">
+                <flux:heading size="lg">
+                    <a href="{{ route('notices.index') }}" wire:navigate>{{ __('Notices') }}</a>
+                </flux:heading>
+                <flux:link :href="route('notices.index')" variant="subtle" class="text-sm" wire:navigate>{{ __('More') }}</flux:link>
+            </div>
             <ul class="divide-y divide-zinc-200 text-sm dark:divide-zinc-700">
                 @foreach ($notices as $notice)
                     <li class="flex justify-between gap-4 py-2">
-                        <span class="truncate">{{ $notice->title }}</span>
+                        <a href="{{ route('notices.show', $notice) }}" class="truncate hover:underline" wire:navigate>{{ $notice->title }}</a>
                         <time class="shrink-0 text-zinc-500" datetime="{{ $notice->created_at->toDateString() }}">
                             {{ $notice->created_at->format('Y.m.d') }}
                         </time>

@@ -24,4 +24,5 @@
         </time>
     </td>
     <td class="py-2 text-center text-zinc-500 max-sm:hidden">{{ number_format($post->view_count) }}</td>
+    <td class="py-2 text-center text-zinc-500 max-sm:hidden">{{ $post->upvotes_count ?? 0 }}</td>
 </tr>

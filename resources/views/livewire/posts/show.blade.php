@@ -29,6 +29,28 @@ new class extends Component {
         $this->redirectRoute('boards.show', $board, navigate: true);
     }
 
+    public function vote(int $value): void
+    {
+        if (! auth()->check()) {
+            $this->redirectRoute('login', navigate: true);
+
+            return;
+        }
+
+        $this->authorize('vote', $this->post);
+
+        $this->post->toggleVote(auth()->user(), $value);
+    }
+
+    public function with(): array
+    {
+        return [
+            'upvotes' => $this->post->votes()->where('value', 1)->count(),
+            'downvotes' => $this->post->votes()->where('value', -1)->count(),
+            'myVote' => $this->post->voteOf(auth()->user()),
+        ];
+    }
+
     public function togglePin(): void
     {
         $this->authorize('pin', $this->post);
@@ -67,6 +89,17 @@ new class extends Component {
 
     <div class="post-content">
         {!! $post->content !!}
+    </div>
+
+    <div class="flex justify-center gap-2">
+        @include('partials.vote-buttons', [
+            'up' => $upvotes,
+            'down' => $downvotes,
+            'mine' => $myVote,
+            'action' => 'vote(%d)',
+            'canVote' => auth()->guest() || auth()->user()->can('vote', $post),
+            'size' => 'base',
+        ])
     </div>
 
     @if ($post->attachments->isNotEmpty())
@@ -127,4 +160,6 @@ new class extends Component {
             @endcan
         </div>
     </footer>
+
+    <livewire:posts.comments :post="$post" :key="'comments-'.$post->id" />
 </article>

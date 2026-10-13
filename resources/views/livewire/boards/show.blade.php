@@ -57,12 +57,12 @@ new class extends Component {
             ->when($term !== '', fn ($query) => $query->search($field, $term))
             ->when($this->subject !== '', fn ($query) => $query->where('subject', $this->subject))
             ->with('user')
-            ->withCount('comments')
+            ->withCount('comments')->withVoteCounts()
             ->latest('id')
             ->paginate(self::PER_PAGE);
 
         $pinned = $posts->onFirstPage() && $term === ''
-            ? $this->board->posts()->where('is_pinned', true)->with('user')->withCount('comments')->latest('id')->get()
+            ? $this->board->posts()->where('is_pinned', true)->with('user')->withCount('comments')->withVoteCounts()->latest('id')->get()
             : collect();
 
         return compact('posts', 'pinned');
@@ -99,6 +99,7 @@ new class extends Component {
                     <th class="w-32 py-2 text-left font-normal">{{ __('Author') }}</th>
                     <th class="w-24 py-2 text-center font-normal">{{ __('Date') }}</th>
                     <th class="w-16 py-2 text-center font-normal max-sm:hidden">{{ __('Views') }}</th>
+                    <th class="w-16 py-2 text-center font-normal max-sm:hidden">{{ __('Likes') }}</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700">
@@ -110,7 +111,7 @@ new class extends Component {
                     @include('partials.post-row', ['post' => $post, 'number' => $posts->total() - ($posts->firstItem() + $loop->index) + 1])
                 @empty
                     <tr>
-                        <td colspan="5" class="py-10 text-center text-zinc-500">
+                        <td colspan="6" class="py-10 text-center text-zinc-500">
                             {{ $search !== '' ? __('No posts match your search.') : __('No posts yet.') }}
                         </td>
                     </tr>

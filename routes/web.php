@@ -11,11 +11,14 @@ Route::redirect('dashboard', '/')->name('dashboard');
 
 Volt::route('boards/{board}', 'boards.show')->name('boards.show');
 Volt::route('posts/{post}', 'posts.show')->whereNumber('post')->name('posts.show');
+Volt::route('notices', 'notices.index')->name('notices.index');
+Volt::route('notices/{notice}', 'notices.show')->whereNumber('notice')->name('notices.show');
 
 Route::middleware(['auth'])->group(function () {
     Volt::route('boards/{board}/write', 'posts.create')->name('posts.create');
     Volt::route('posts/{post}/edit', 'posts.edit')->whereNumber('post')->name('posts.edit');
     Route::get('attachments/{attachment}', AttachmentController::class)->name('attachments.download');
+    Volt::route('my/activity', 'my.activity')->name('my.activity');
 
     Route::redirect('settings', 'settings/profile');
 
