@@ -28,7 +28,7 @@ new class extends Component {
     </header>
 
     <div class="post-content">
-        {!! $notice->content !!}
+        {!! \App\Support\VideoEmbed::render($notice->content) !!}
     </div>
 
     <div>

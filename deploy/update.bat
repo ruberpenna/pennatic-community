@@ -13,6 +13,7 @@ call composer install --no-dev --optimize-autoloader --no-interaction || goto :u
 call npm ci --no-audit --no-fund || goto :up_error
 call npm run build || goto :up_error
 php artisan migrate --force || goto :up_error
+php artisan posts:prune-images || goto :up_error
 php artisan optimize || goto :up_error
 php artisan filament:optimize || goto :up_error
 nssm restart penna-php-1 || goto :up_error

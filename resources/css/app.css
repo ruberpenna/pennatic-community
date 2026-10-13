@@ -79,6 +79,12 @@ select:focus[data-flux-control] {
     & pre { @apply my-2 overflow-x-auto rounded bg-zinc-100 p-3 font-mono text-sm dark:bg-zinc-900; }
     & a { @apply text-blue-600 underline dark:text-blue-400; }
     & img { @apply my-2 h-auto max-w-full; }
+    & figure { @apply my-2; }
+    & figcaption { @apply text-sm text-zinc-500; }
+
+    /* YouTube / CHZZK players built by App\Support\VideoEmbed */
+    & .video-embed { @apply my-3 aspect-video w-full max-w-3xl overflow-hidden rounded-lg bg-black; }
+    & .video-embed iframe { @apply size-full border-0; }
 }
 
 trix-editor.post-content {

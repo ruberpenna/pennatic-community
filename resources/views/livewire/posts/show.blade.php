@@ -99,7 +99,7 @@ new class extends Component {
     </header>
 
     <div class="post-content">
-        {!! $post->content !!}
+        {!! \App\Support\VideoEmbed::render($post->content) !!}
     </div>
 
     <div class="flex justify-center gap-2">

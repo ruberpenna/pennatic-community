@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Concerns\UploadsEditorImages;
 use App\Livewire\Forms\PostForm;
 use App\Models\Board;
 use App\Models\Post;
@@ -8,7 +9,7 @@ use Livewire\Volt\Component;
 use Livewire\WithFileUploads;
 
 new class extends Component {
-    use WithFileUploads;
+    use UploadsEditorImages, WithFileUploads;
 
     public PostForm $form;
 

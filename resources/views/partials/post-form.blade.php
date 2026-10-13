@@ -11,7 +11,7 @@
 
     <flux:input wire:model="form.title" :label="__('Title')" maxlength="100" required />
 
-    <x-editor model="form.content" :value="$form->content" :label="__('Content')" />
+    <x-editor model="form.content" :value="$form->content" :label="__('Content')" images />
 
     <flux:field>
         <flux:label>{{ __('Attachments') }}</flux:label>

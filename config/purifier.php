@@ -38,6 +38,8 @@ return [
             'HTML.TargetBlank'         => true,
             'HTML.Nofollow'            => true,
             'URI.AllowedSchemes'       => ['http' => true, 'https' => true, 'mailto' => true],
+            // Images may only come from this site (/storage/...), never from other hosts (tracking pixels, hotlinks).
+            'URI.DisableExternalResources' => true,
             'AutoFormat.AutoParagraph' => false,
             'AutoFormat.RemoveEmpty'   => false,
         ],
