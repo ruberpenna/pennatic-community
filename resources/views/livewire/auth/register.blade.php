@@ -9,6 +9,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
 new #[Layout('components.layouts.auth')] class extends Component {
+    public string $username = '';
     public string $name = '';
     public string $email = '';
     public string $password = '';
@@ -20,7 +21,8 @@ new #[Layout('components.layouts.auth')] class extends Component {
     public function register(): void
     {
         $validated = $this->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'username' => ['required', 'string', 'lowercase', 'alpha_dash:ascii', 'min:4', 'max:20', 'unique:' . User::class],
+            'name' => ['required', 'string', 'min:2', 'max:30', 'unique:' . User::class],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
         ]);
@@ -42,9 +44,14 @@ new #[Layout('components.layouts.auth')] class extends Component {
     <x-auth-session-status class="text-center" :status="session('status')" />
 
     <form wire:submit="register" class="flex flex-col gap-6">
-        <!-- Name -->
+        <!-- Username -->
         <div class="grid gap-2">
-            <flux:input wire:model="name" id="name" label="{{ __('Name') }}" type="text" name="name" required autofocus autocomplete="name" placeholder="Full name" />
+            <flux:input wire:model="username" id="username" label="{{ __('Username') }}" type="text" name="username" required autofocus autocomplete="username" />
+        </div>
+
+        <!-- Nickname -->
+        <div class="grid gap-2">
+            <flux:input wire:model="name" id="name" label="{{ __('Nickname') }}" type="text" name="name" required autocomplete="nickname" />
         </div>
 
         <!-- Email Address -->

@@ -13,12 +13,19 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('username', 30)->unique(); // login id (legacy mem_id)
+            $table->string('name', 30)->unique(); // nickname (legacy mem_nick)
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->boolean('password_must_change')->default(false);
+            $table->string('role', 20)->default('member');
+            $table->unsignedTinyInteger('level')->default(1); // legacy mem_emblem
+            $table->string('avatar_path')->nullable();
+            $table->text('intro')->nullable();
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

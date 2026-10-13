@@ -27,7 +27,7 @@ new class extends Component {
         $user = Auth::user();
 
         $validated = $this->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'min:2', 'max:30', Rule::unique(User::class)->ignore($user->id)],
 
             'email' => [
                 'required',
