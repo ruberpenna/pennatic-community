@@ -42,6 +42,7 @@ return [
     'doesnt_end_with'        => ':attribute은 다음 중 하나로 끝날 수 없습니다: :values.',
     'doesnt_start_with'      => ':attribute은 다음 중 하나로 시작할 수 없습니다: :values.',
     'email'                  => ':attribute은(는) 유효한 이메일 주소여야 합니다.',
+    'indisposable'           => '일회용(임시) 이메일 주소는 사용할 수 없습니다.',
     'encoding'               => ':attribute은(는) :encoding (으)로 인코딩 되어야 합니다.',
     'ends_with'              => ':attribute은(는) 다음 중 하나로 끝나야 합니다: :values.',
     'enum'                   => ':attribute의 값이 잘못되었습니다.',

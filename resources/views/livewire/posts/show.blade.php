@@ -1,11 +1,14 @@
 <?php
 
+use App\Livewire\Concerns\RequiresVerifiedMember;
 use App\Models\Post;
 use Illuminate\Support\Number;
 use Illuminate\View\View;
 use Livewire\Volt\Component;
 
 new class extends Component {
+    use RequiresVerifiedMember;
+
     public Post $post;
 
     public function mount(Post $post): void
@@ -33,9 +36,7 @@ new class extends Component {
 
     public function vote(int $value): void
     {
-        if (! auth()->check()) {
-            $this->redirectRoute('login', navigate: true);
-
+        if (! $this->ensureVerifiedMember()) {
             return;
         }
 

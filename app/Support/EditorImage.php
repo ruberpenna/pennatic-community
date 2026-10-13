@@ -28,7 +28,8 @@ class EditorImage
      */
     public static function rules(): array
     {
-        return ['required', 'image', 'mimes:'.implode(',', self::TYPES), 'max:'.self::MAX_KB, 'dimensions:max_width=12000,max_height=12000'];
+        // Decoding needs width x height x 4 bytes, so cap the pixel size as well as the file size.
+        return ['required', 'image', 'mimes:'.implode(',', self::TYPES), 'max:'.self::MAX_KB, 'dimensions:max_width=8000,max_height=8000'];
     }
 
     /**
@@ -54,6 +55,20 @@ class EditorImage
     }
 
     private static function reencode(string $source, string $type): string
+    {
+        // An 8000x8000 image is ~256MB once decoded, well above PHP's default 128MB.
+        $previousLimit = ini_get('memory_limit');
+        ini_set('memory_limit', '640M');
+
+        try {
+            return self::reencodeImage($source, $type);
+        } finally {
+            gc_collect_cycles();
+            ini_set('memory_limit', $previousLimit);
+        }
+    }
+
+    private static function reencodeImage(string $source, string $type): string
     {
         $image = imagecreatefromstring(file_get_contents($source));
 

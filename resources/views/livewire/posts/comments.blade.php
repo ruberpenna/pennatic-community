@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Concerns\RequiresVerifiedMember;
 use App\Models\Comment;
 use App\Models\CommentVote;
 use App\Models\Post;
@@ -7,6 +8,8 @@ use Livewire\Attributes\Locked;
 use Livewire\Volt\Component;
 
 new class extends Component {
+    use RequiresVerifiedMember;
+
     public const MAX_LENGTH = 1000;
 
     #[Locked]
@@ -31,7 +34,7 @@ new class extends Component {
 
     public function add(): void
     {
-        if (! $this->ensureLoggedIn()) {
+        if (! $this->ensureVerifiedMember()) {
             return;
         }
 
@@ -43,7 +46,7 @@ new class extends Component {
 
     public function startReply(int $commentId): void
     {
-        if (! $this->ensureLoggedIn()) {
+        if (! $this->ensureVerifiedMember()) {
             return;
         }
 
@@ -53,7 +56,7 @@ new class extends Component {
 
     public function reply(): void
     {
-        if (! $this->ensureLoggedIn()) {
+        if (! $this->ensureVerifiedMember()) {
             return;
         }
 
@@ -97,7 +100,7 @@ new class extends Component {
 
     public function vote(int $commentId, int $value): void
     {
-        if (! $this->ensureLoggedIn()) {
+        if (! $this->ensureVerifiedMember()) {
             return;
         }
 
@@ -152,16 +155,6 @@ new class extends Component {
         $this->dispatch('comment-count-changed');
     }
 
-    private function ensureLoggedIn(): bool
-    {
-        if (auth()->check()) {
-            return true;
-        }
-
-        $this->redirectRoute('login', navigate: true);
-
-        return false;
-    }
 }; ?>
 
 <section class="flex flex-col gap-4">

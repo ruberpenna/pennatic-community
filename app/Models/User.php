@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Support\EmailAddress;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -13,10 +14,20 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-class User extends Authenticatable implements FilamentUser // , MustVerifyEmail
+class User extends Authenticatable implements FilamentUser, MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, SoftDeletes;
+
+    protected static function booted(): void
+    {
+        // Kept in sync so one mailbox (e.g. Gmail dot/plus variants) cannot hold several accounts.
+        static::saving(function (User $user) {
+            if ($user->isDirty('email') || $user->email_canonical === null) {
+                $user->email_canonical = EmailAddress::canonical($user->email);
+            }
+        });
+    }
 
     /**
      * The attributes that are mass assignable.

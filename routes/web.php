@@ -15,16 +15,21 @@ Volt::route('notices', 'notices.index')->name('notices.index');
 Volt::route('notices/{notice}', 'notices.show')->whereNumber('notice')->name('notices.show');
 
 Route::middleware(['auth'])->group(function () {
-    Volt::route('boards/{board}/write', 'posts.create')->name('posts.create');
-    Volt::route('posts/{post}/edit', 'posts.edit')->whereNumber('post')->name('posts.edit');
+    // Writing and member-to-member features need a verified email (one mailbox, one account).
+    Route::middleware(['verified'])->group(function () {
+        Volt::route('boards/{board}/write', 'posts.create')->name('posts.create');
+        Volt::route('posts/{post}/edit', 'posts.edit')->whereNumber('post')->name('posts.edit');
+
+        Volt::route('messages', 'messages.index')->name('messages.index');
+        Volt::route('messages/new', 'messages.create')->name('messages.create');
+        Volt::route('messages/{message}', 'messages.show')->whereNumber('message')->name('messages.show');
+        Volt::route('memos', 'memos.index')->name('memos.index');
+        Volt::route('attendance', 'attendance')->name('attendance');
+    });
+
     Route::get('attachments/{attachment}', AttachmentController::class)->name('attachments.download');
     Volt::route('my/activity', 'my.activity')->name('my.activity');
-
-    Volt::route('messages', 'messages.index')->name('messages.index');
-    Volt::route('messages/new', 'messages.create')->name('messages.create');
-    Volt::route('messages/{message}', 'messages.show')->whereNumber('message')->name('messages.show');
-    Volt::route('memos', 'memos.index')->name('memos.index');
-    Volt::route('attendance', 'attendance')->name('attendance');
+    // Stays open before verification so someone who never got the mail can still reach an admin.
     Volt::route('contact', 'contact')->name('contact');
 
     Route::redirect('settings', 'settings/profile');

@@ -62,3 +62,21 @@ G:\penna\deploy\update.bat
 ## 레거시 데이터 다시 가져오기
 
 `php artisan db:seed --class=LegacyImportSeeder --force` — 여러 번 실행해도 중복되지 않습니다.
+
+## 메일 발송 (네이버 SMTP)
+
+회원가입 인증 메일과 비밀번호 재설정 메일에 씁니다.
+
+1. 네이버 메일 → 환경설정 → **POP3/IMAP 설정** → **POP3/SMTP 사용: 사용함**
+2. 네이버 2단계 인증을 쓰고 있다면 네이버 계정 → 보안 설정 → **애플리케이션 비밀번호**를 하나 만듭니다.
+3. `G:\penna\.env`의 `MAIL_PASSWORD=` 뒤에 비밀번호(또는 애플리케이션 비밀번호)를 넣습니다.
+   `MAIL_USERNAME`, `MAIL_FROM_ADDRESS`는 보내는 네이버 메일 주소와 같아야 합니다.
+4. 관리자 권한 명령 프롬프트에서 적용합니다.
+   ```bat
+   cd /d G:\penna
+   php artisan optimize
+   nssm restart penna-php-1
+   nssm restart penna-php-2
+   ```
+
+메일 발송이 실패해도 가입은 완료되고, 회원은 인증 화면에서 메일을 다시 받을 수 있습니다. 실패 기록은 `storage\logs`에 남습니다.

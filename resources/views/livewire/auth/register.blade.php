@@ -1,10 +1,13 @@
 <?php
 
 use App\Models\User;
+use App\Rules\UniqueMailbox;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\Rules;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
@@ -18,22 +21,45 @@ new #[Layout('components.layouts.auth')] class extends Component {
     /**
      * Handle an incoming registration request.
      */
+    /** Accounts that may be created from one IP address per hour. */
+    public const PER_IP_PER_HOUR = 3;
+
     public function register(): void
     {
+        $key = 'register:'.request()->ip();
+
+        if (RateLimiter::tooManyAttempts($key, self::PER_IP_PER_HOUR)) {
+            throw ValidationException::withMessages([
+                'username' => __('Too many accounts were created from this network. Try again in :minutes minutes.', [
+                    'minutes' => ceil(RateLimiter::availableIn($key) / 60),
+                ]),
+            ]);
+        }
+
         $validated = $this->validate([
             'username' => ['required', 'string', 'lowercase', 'alpha_dash:ascii', 'min:4', 'max:20', 'unique:' . User::class],
             'name' => ['required', 'string', 'min:2', 'max:30', 'unique:' . User::class],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class, 'indisposable', new UniqueMailbox],
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
 
-        event(new Registered(($user = User::create($validated))));
+        $user = User::create($validated);
+        RateLimiter::hit($key, 3600);
+
+        try {
+            // Sends the verification mail (synchronously).
+            event(new Registered($user));
+        } catch (Throwable $e) {
+            // The account exists either way; the user can resend the mail from the verification page.
+            report($e);
+            session()->flash('status', 'verification-mail-failed');
+        }
 
         Auth::login($user);
 
-        $this->redirect(route('dashboard', absolute: false), navigate: true);
+        $this->redirect(route('verification.notice', absolute: false), navigate: true);
     }
 }; ?>
 

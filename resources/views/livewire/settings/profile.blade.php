@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use App\Rules\UniqueMailbox;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
@@ -42,7 +43,9 @@ new class extends Component {
                 'lowercase',
                 'email',
                 'max:255',
-                Rule::unique(User::class)->ignore($user->id)
+                Rule::unique(User::class)->ignore($user->id),
+                'indisposable',
+                new UniqueMailbox($user->id),
             ],
 
             'intro' => ['nullable', 'string', 'max:300'],
