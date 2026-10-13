@@ -14,6 +14,7 @@ new class extends Component {
     public function mount(Post $post): void
     {
         $this->authorize('update', $post);
+        $post->board->ensureVisibleTo(auth()->user());
 
         $this->form->setPost($post);
     }

@@ -8,7 +8,9 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\ToggleButtons;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
@@ -38,6 +40,10 @@ class BoardsRelationManager extends RelationManager
                         ignoreRecord: true,
                         modifyRuleUsing: fn (Unique $rule) => $rule->where('board_folder_id', $this->getOwnerRecord()->getKey()),
                     ),
+                Toggle::make('is_private')
+                    ->label(__('Private (admins only)'))
+                    ->helperText(__('Members and guests cannot see this board at all. Its menu icon is a lock.'))
+                    ->live(),
                 ToggleButtons::make('icon')
                     ->label(__('Menu icon'))
                     ->helperText(__('Shown next to the board name in the menu, and alone when the menu is collapsed.'))
@@ -45,7 +51,9 @@ class BoardsRelationManager extends RelationManager
                     ->icons(collect(Board::ICONS)->mapWithKeys(fn ($label, string $icon) => [$icon => "heroicon-o-{$icon}"])->all())
                     ->default(Board::DEFAULT_ICON)
                     ->in(array_keys(Board::ICONS))
-                    ->required()
+                    // Private boards always show the lock; the chosen icon comes back if the board is made public again.
+                    ->hidden(fn (Get $get) => (bool) $get('is_private'))
+                    ->required(fn (Get $get) => ! $get('is_private'))
                     ->inline(),
                 TagsInput::make('subjects')
                     ->label(__('Subjects'))
@@ -69,6 +77,7 @@ class BoardsRelationManager extends RelationManager
                     ->color('gray'),
                 TextColumn::make('name')
                     ->label(__('Board name'))
+                    ->description(fn (Board $record) => $record->is_private ? __('Private (admins only)') : null)
                     ->url(fn (Board $record) => route('boards.show', $record))
                     ->openUrlInNewTab(),
                 TextColumn::make('subjects')

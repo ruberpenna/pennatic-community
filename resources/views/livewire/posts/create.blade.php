@@ -15,6 +15,7 @@ new class extends Component {
     public function mount(Board $board): void
     {
         $this->authorize('create', Post::class);
+        $board->ensureVisibleTo(auth()->user());
 
         $this->form->forBoard($board);
     }

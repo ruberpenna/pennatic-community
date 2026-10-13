@@ -33,7 +33,8 @@ class AppServiceProvider extends ServiceProvider
 
         View::composer('components.layouts.app.sidebar', function ($view) {
             $view->with([
-                'boardFolders' => BoardFolder::with('boards')->orderBy('sort_order')->orderBy('id')->get(),
+                'boardFolders' => BoardFolder::with(['boards' => fn ($query) => $query->visibleTo(auth()->user())])
+                    ->orderBy('sort_order')->orderBy('id')->get(),
                 'currentBoardId' => $this->currentBoardId(),
                 'unreadMessages' => auth()->check()
                     ? Message::inboxOf(auth()->user())->whereNull('read_at')->count()

@@ -24,6 +24,8 @@ new class extends Component {
 
     public function mount(Post $post): void
     {
+        $post->board->ensureVisibleTo(auth()->user());
+
         $this->postId = $post->id;
     }
 
@@ -140,7 +142,7 @@ new class extends Component {
 
     private function createComment(string $content, ?int $parentId = null): void
     {
-        abort_unless(Post::whereKey($this->postId)->exists(), 404);
+        Post::findOrFail($this->postId)->board->ensureVisibleTo(auth()->user());
 
         $comment = new Comment(['content' => trim($content), 'parent_id' => $parentId]);
         $comment->post_id = $this->postId;

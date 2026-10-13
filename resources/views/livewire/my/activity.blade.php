@@ -29,8 +29,12 @@ new class extends Component {
 
         return [
             'items' => $this->tab === 'comments'
-                ? Comment::where('user_id', $user->id)->whereHas('post')->with('post.board')->latest('id')->paginate(20)
-                : Post::where('user_id', $user->id)->with('board')->withCount('comments')->latest('id')->paginate(20),
+                ? Comment::where('user_id', $user->id)
+                    ->whereHas('post.board', fn ($query) => $query->visibleTo($user))
+                    ->with('post.board')->latest('id')->paginate(20)
+                : Post::where('user_id', $user->id)
+                    ->whereHas('board', fn ($query) => $query->visibleTo($user))
+                    ->with('board')->withCount('comments')->latest('id')->paginate(20),
         ];
     }
 }; ?>

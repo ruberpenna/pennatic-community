@@ -28,6 +28,8 @@ new class extends Component {
 
     public function mount(Board $board): void
     {
+        $board->ensureVisibleTo(auth()->user());
+
         $this->board = $board;
     }
 
@@ -73,7 +75,12 @@ new class extends Component {
     <div class="flex flex-wrap items-end justify-between gap-4">
         <div>
             <flux:subheading>{{ $board->folder->name }}</flux:subheading>
-            <flux:heading size="xl" level="1">{{ $board->name }}</flux:heading>
+            <flux:heading size="xl" level="1" class="flex items-center gap-2">
+                {{ $board->name }}
+                @if ($board->is_private)
+                    <flux:badge size="sm" icon="lock-closed">{{ __('Private') }}</flux:badge>
+                @endif
+            </flux:heading>
         </div>
 
         @can('create', Post::class)

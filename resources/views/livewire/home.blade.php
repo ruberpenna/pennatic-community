@@ -10,6 +10,7 @@ new class extends Component {
         return [
             'notices' => Notice::latest()->limit(5)->get(),
             'boards' => Board::query()
+                ->visibleTo(auth()->user())
                 ->join('board_folders', 'board_folders.id', '=', 'boards.board_folder_id')
                 ->orderBy('board_folders.sort_order')
                 ->orderBy('boards.sort_order')

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -41,13 +42,46 @@ class Board extends Model
         'board_folder_id',
         'name',
         'icon',
+        'is_private',
         'subjects',
         'sort_order',
     ];
 
+    public const PRIVATE_ICON = 'lock-closed';
+
     public function menuIcon(): string
     {
+        if ($this->is_private) {
+            return self::PRIVATE_ICON;
+        }
+
         return array_key_exists((string) $this->icon, self::ICONS) ? $this->icon : self::DEFAULT_ICON;
+    }
+
+    /**
+     * Private boards (and their posts, comments and files) exist only for admins.
+     */
+    public function isVisibleTo(?User $user): bool
+    {
+        return ! $this->is_private || (bool) $user?->isAdmin();
+    }
+
+    /**
+     * Abort with 404 (not 403) so non-admins cannot tell that a private board exists.
+     */
+    public function ensureVisibleTo(?User $user): void
+    {
+        abort_unless($this->isVisibleTo($user), 404);
+    }
+
+    /**
+     * @param  Builder<Board>  $query
+     */
+    public function scopeVisibleTo(Builder $query, ?User $user): void
+    {
+        if (! $user?->isAdmin()) {
+            $query->where('is_private', false);
+        }
     }
 
     /**
@@ -57,6 +91,7 @@ class Board extends Model
     {
         return [
             'subjects' => 'array',
+            'is_private' => 'boolean',
         ];
     }
 
