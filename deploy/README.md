@@ -1,7 +1,9 @@
 # Penna 운영 서버 (Windows)
 
+도메인: `https://myhome.pennatic.info` (Cloudflare 프록시 사용)
+
 ```
-인터넷 → 공유기(80/443) → Nginx Proxy Manager(HTTPS, 192.168.0.33)
+인터넷 → Cloudflare → 공유기(80/443) → Nginx Proxy Manager(HTTPS, 192.168.0.33)
        → nginx(이 PC 192.168.0.24:8124) → php-cgi 2개(127.0.0.1:9101, 9102)
        → MySQL(192.168.0.27, DB penna)
 ```
@@ -32,7 +34,14 @@ G:\penna\deploy\update.bat
    - Domain: 사이트 도메인 / Scheme: `http` / Forward IP: `192.168.0.24` / Port: `8124`
    - Websockets Support는 꺼도 됩니다.
    - SSL 탭: Let's Encrypt 발급, Force SSL 켜기
-   - Advanced 탭: `client_max_body_size 60m;` (첨부파일 업로드용)
+   - Advanced 탭: 아래 내용 (첨부파일 업로드 크기, Cloudflare 뒤의 실제 방문자 IP)
+     ```nginx
+     client_max_body_size 60m;
+     real_ip_header CF-Connecting-IP;
+     # https://www.cloudflare.com/ips/ 의 IP 대역을 set_real_ip_from 으로 모두 추가
+     ```
+     실제 IP를 넘기지 않으면 로그인 실패 제한 등이 Cloudflare 서버 IP 단위로 묶입니다.
+   - Cloudflare SSL/TLS 모드는 Full (strict)를 권장합니다.
 2. `G:\penna\.env` 수정
    ```
    APP_URL=https://도메인
