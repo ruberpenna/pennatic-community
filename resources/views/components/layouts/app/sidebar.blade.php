@@ -4,58 +4,63 @@
         @include('partials.head')
     </head>
     <body class="min-h-screen bg-white dark:bg-zinc-800">
-        <flux:sidebar sticky stashable class="border-r border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
-            <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
+        {{-- collapsible: on desktop the sidebar can shrink to an icon rail (names appear as tooltips); Flux stores the state. --}}
+        <flux:sidebar sticky collapsible class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
+            <flux:sidebar.header>
+                <flux:sidebar.brand :href="route('home')" :name="config('app.name')" wire:navigate>
+                    <x-slot name="logo" class="size-8 rounded-md bg-accent-content text-accent-foreground">
+                        <x-app-logo-icon class="size-5 fill-current text-white dark:text-black" />
+                    </x-slot>
+                </flux:sidebar.brand>
 
-            <a href="{{ route('home') }}" class="mr-5 flex items-center space-x-2" wire:navigate>
-                <x-app-logo class="size-8" href="#"></x-app-logo>
-            </a>
+                <flux:sidebar.collapse class="lg:hidden" />
+            </flux:sidebar.header>
 
-            <flux:navlist variant="outline">
-                <flux:navlist.item icon="home" :href="route('home')" :current="request()->routeIs('home')" wire:navigate>{{ __('Home') }}</flux:navlist.item>
-                <flux:navlist.item icon="megaphone" :href="route('notices.index')" :current="request()->routeIs('notices.*')" wire:navigate>{{ __('Notices') }}</flux:navlist.item>
+            <flux:sidebar.nav>
+                <flux:sidebar.item icon="home" :href="route('home')" :current="request()->routeIs('home')" wire:navigate>{{ __('Home') }}</flux:sidebar.item>
+                <flux:sidebar.item icon="megaphone" :href="route('notices.index')" :current="request()->routeIs('notices.*')" wire:navigate>{{ __('Notices') }}</flux:sidebar.item>
 
+                {{-- Plain headings instead of sidebar.group: Flux hides whole groups in the collapsed rail, but board icons should stay. --}}
                 @foreach ($boardFolders as $folder)
                     @continue($folder->boards->isEmpty())
 
-                    <flux:navlist.group :heading="$folder->name" class="mt-4 grid">
-                        @foreach ($folder->boards as $board)
-                            <flux:navlist.item
-                                icon="chat-bubble-left-right"
-                                :href="route('boards.show', $board)"
-                                :current="$currentBoardId === $board->id"
-                                wire:navigate
-                            >
-                                {{ $board->name }}
-                            </flux:navlist.item>
-                        @endforeach
-                    </flux:navlist.group>
+                    @include('partials.sidebar-heading', ['heading' => $folder->name])
+
+                    @foreach ($folder->boards as $board)
+                        <flux:sidebar.item
+                            icon="chat-bubble-left-right"
+                            :href="route('boards.show', $board)"
+                            :current="$currentBoardId === $board->id"
+                            wire:navigate
+                        >{{ $board->name }}</flux:sidebar.item>
+                    @endforeach
                 @endforeach
 
                 @auth
-                    <flux:navlist.group :heading="__('My space')" class="mt-4 grid">
-                        <flux:navlist.item
-                            icon="envelope"
-                            :href="route('messages.index')"
-                            :current="request()->routeIs('messages.*')"
-                            :badge="$unreadMessages ?: null"
-                            wire:navigate
-                        >{{ __('Messages') }}</flux:navlist.item>
-                        <flux:navlist.item icon="pencil" :href="route('memos.index')" :current="request()->routeIs('memos.*')" wire:navigate>{{ __('Memos') }}</flux:navlist.item>
-                        <flux:navlist.item icon="calendar-days" :href="route('attendance')" :current="request()->routeIs('attendance')" wire:navigate>{{ __('Attendance') }}</flux:navlist.item>
-                        <flux:navlist.item icon="lifebuoy" :href="route('contact')" :current="request()->routeIs('contact')" wire:navigate>{{ __('Contact the admin') }}</flux:navlist.item>
-                    </flux:navlist.group>
+                    @include('partials.sidebar-heading', ['heading' => __('My space')])
+
+                    <flux:sidebar.item
+                        icon="envelope"
+                        :href="route('messages.index')"
+                        :current="request()->routeIs('messages.*')"
+                        :badge="$unreadMessages ?: null"
+                        :icon-dot="$unreadMessages > 0"
+                        wire:navigate
+                    >{{ __('Messages') }}</flux:sidebar.item>
+                    <flux:sidebar.item icon="pencil" :href="route('memos.index')" :current="request()->routeIs('memos.*')" wire:navigate>{{ __('Memos') }}</flux:sidebar.item>
+                    <flux:sidebar.item icon="calendar-days" :href="route('attendance')" :current="request()->routeIs('attendance')" wire:navigate>{{ __('Attendance') }}</flux:sidebar.item>
+                    <flux:sidebar.item icon="lifebuoy" :href="route('contact')" :current="request()->routeIs('contact')" wire:navigate>{{ __('Contact the admin') }}</flux:sidebar.item>
                 @endauth
-            </flux:navlist>
+            </flux:sidebar.nav>
 
-            <flux:spacer />
+            <flux:sidebar.spacer />
 
-            <x-theme-toggle class="max-lg:hidden" />
+            <x-theme-toggle class="max-lg:hidden in-data-flux-sidebar-collapsed-desktop:hidden" />
+            <x-theme-menu class="hidden in-data-flux-sidebar-collapsed-desktop:block" />
 
             @auth
-                <!-- Desktop User Menu -->
-                <flux:dropdown position="bottom" align="start">
-                    <flux:profile
+                <flux:dropdown position="top" align="start" class="max-lg:hidden">
+                    <flux:sidebar.profile
                         :name="auth()->user()->name"
                         :initials="auth()->user()->initials()"
                         :avatar="auth()->user()->avatarUrl()"
@@ -65,14 +70,18 @@
                     @include('partials.user-menu')
                 </flux:dropdown>
             @else
-                <div class="flex flex-col gap-2">
+                <div class="flex flex-col gap-2 in-data-flux-sidebar-collapsed-desktop:hidden">
                     <flux:button variant="primary" size="sm" :href="route('login')" wire:navigate>{{ __('Log in') }}</flux:button>
                     <flux:button size="sm" :href="route('register')" wire:navigate>{{ __('Sign up') }}</flux:button>
                 </div>
+                <div class="hidden in-data-flux-sidebar-collapsed-desktop:block">
+                    <flux:sidebar.item icon="arrow-right-end-on-rectangle" :href="route('login')" wire:navigate>{{ __('Log in') }}</flux:sidebar.item>
+                    <flux:sidebar.item icon="user-plus" :href="route('register')" wire:navigate>{{ __('Sign up') }}</flux:sidebar.item>
+                </div>
             @endauth
-        </flux:sidebar>
 
-        <x-sidebar-toggle />
+            <x-sidebar-toggle />
+        </flux:sidebar>
 
         <!-- Mobile User Menu -->
         <flux:header class="lg:hidden">

@@ -105,22 +105,11 @@ trix-editor.post-content {
     display: none !important;
 }
 
-/* Desktop sidebar hide/show (see components/sidebar-toggle). The sidebar is w-64 (16rem). */
-.sidebar-toggle {
-    left: calc(16rem - 0.875rem);
-}
-
+/* Until Flux boots, give a sidebar that was left collapsed its rail width (see partials/head). */
 @media (min-width: 64rem) {
-    .sidebar-hidden [data-flux-sidebar] {
-        display: none;
-    }
-
-    .sidebar-hidden .sidebar-toggle {
-        left: 0.5rem;
-    }
-
-    /* Keep content clear of the floating show button. */
-    .sidebar-hidden [data-flux-main] {
-        padding-inline-start: 3rem;
+    .sidebar-collapsed [data-flux-sidebar][data-flux-sidebar-cloak] {
+        width: 3.5rem;
+        padding-inline: 0.5rem;
+        overflow: hidden;
     }
 }

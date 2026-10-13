@@ -1,13 +1,13 @@
 import 'trix';
 import 'trix/dist/trix.css';
 
-// wire:navigate replaces the <html> class, so re-apply the saved sidebar state (see partials/head) on every swap.
+// wire:navigate replaces the <html> class, so re-apply the collapsed-sidebar hint (see partials/head) on every swap.
 const applySidebarState = () => {
-    let hidden = false;
+    let collapsed = false;
     try {
-        hidden = localStorage.getItem('penna.sidebar') === 'hidden';
+        collapsed = localStorage.getItem('flux-sidebar-collapsed-desktop') === 'true';
     } catch (e) {}
-    document.documentElement.classList.toggle('sidebar-hidden', hidden);
+    document.documentElement.classList.toggle('sidebar-collapsed', collapsed);
 };
 
 document.addEventListener('livewire:navigating', (event) => event.detail?.onSwap?.(applySidebarState));

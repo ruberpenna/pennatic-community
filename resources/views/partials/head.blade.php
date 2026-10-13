@@ -6,11 +6,11 @@
 <link rel="preconnect" href="https://fonts.bunny.net">
 <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
 
-{{-- Apply the saved desktop sidebar state before the first paint to avoid a flash. --}}
+{{-- Flux restores the collapsed sidebar only after its script loads; hint it before the first paint to avoid a jump. --}}
 <script>
     try {
-        if (localStorage.getItem('penna.sidebar') === 'hidden') {
-            document.documentElement.classList.add('sidebar-hidden');
+        if (localStorage.getItem('flux-sidebar-collapsed-desktop') === 'true') {
+            document.documentElement.classList.add('sidebar-collapsed');
         }
     } catch (e) {}
 </script>
