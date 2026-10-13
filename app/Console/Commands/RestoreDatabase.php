@@ -23,8 +23,15 @@ class RestoreDatabase extends Command
             return self::FAILURE;
         }
 
+        $gz = @gzopen($this->argument('path'), 'rb');
+
+        if ($gz === false) {
+            $this->error('Cannot open '.$this->argument('path'));
+
+            return self::FAILURE;
+        }
+
         $pdo = $connection->getPdo();
-        $gz = gzopen($this->argument('path'), 'rb');
         $buffer = '';
         $statements = 0;
 
