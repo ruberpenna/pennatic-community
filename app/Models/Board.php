@@ -12,15 +12,43 @@ class Board extends Model
     /** @use HasFactory<\Database\Factories\BoardFactory> */
     use HasFactory;
 
+    public const DEFAULT_ICON = 'chat-bubble-left-right';
+
+    /**
+     * Heroicon names admins can pick for a board's menu icon => translation key of its label.
+     *
+     * @var array<string, string>
+     */
+    public const ICONS = [
+        'chat-bubble-left-right' => 'Talk',
+        'question-mark-circle' => 'Questions',
+        'light-bulb' => 'Tips',
+        'book-open' => 'Info',
+        'newspaper' => 'News',
+        'photo' => 'Photos',
+        'film' => 'Videos',
+        'musical-note' => 'Music',
+        'puzzle-piece' => 'Games',
+        'code-bracket' => 'Development',
+        'shopping-bag' => 'Market',
+        'heart' => 'Hobbies',
+    ];
+
     /**
      * @var list<string>
      */
     protected $fillable = [
         'board_folder_id',
         'name',
+        'icon',
         'subjects',
         'sort_order',
     ];
+
+    public function menuIcon(): string
+    {
+        return array_key_exists((string) $this->icon, self::ICONS) ? $this->icon : self::DEFAULT_ICON;
+    }
 
     /**
      * @return array<string, string>

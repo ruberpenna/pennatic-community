@@ -28,7 +28,7 @@
 
                     @foreach ($folder->boards as $board)
                         <flux:sidebar.item
-                            icon="chat-bubble-left-right"
+                            :icon="$board->menuIcon()"
                             :href="route('boards.show', $board)"
                             :current="$currentBoardId === $board->id"
                             wire:navigate

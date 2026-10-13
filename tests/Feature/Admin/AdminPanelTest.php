@@ -136,6 +136,31 @@ class AdminPanelTest extends TestCase
             ->assertTableActionDisabled('delete', $board);
     }
 
+    public function test_board_icon_is_chosen_from_the_allowed_set(): void
+    {
+        $folder = BoardFolder::factory()->create();
+        $this->actingAs($this->admin);
+
+        Livewire::test(BoardsRelationManager::class, ['ownerRecord' => $folder, 'pageClass' => EditBoardFolder::class])
+            ->callTableAction('create', data: ['name' => '사진첩', 'icon' => 'photo'])
+            ->assertHasNoTableActionErrors();
+
+        $this->assertSame('photo', Board::sole()->icon);
+
+        Livewire::test(BoardsRelationManager::class, ['ownerRecord' => $folder, 'pageClass' => EditBoardFolder::class])
+            ->callTableAction('create', data: ['name' => '이상한 아이콘', 'icon' => 'trash'])
+            ->assertHasTableActionErrors(['icon']);
+
+        $this->assertSame(1, Board::count());
+    }
+
+    public function test_sidebar_uses_the_board_icon_with_a_fallback(): void
+    {
+        $this->assertSame('photo', Board::factory()->make(['icon' => 'photo'])->menuIcon());
+        $this->assertSame(Board::DEFAULT_ICON, Board::factory()->make(['icon' => null])->menuIcon());
+        $this->assertSame(Board::DEFAULT_ICON, Board::factory()->make(['icon' => 'not-allowed'])->menuIcon());
+    }
+
     public function test_force_deleting_a_post_removes_its_files(): void
     {
         Storage::fake('local');
