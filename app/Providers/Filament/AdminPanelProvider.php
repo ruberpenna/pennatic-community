@@ -14,6 +14,7 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Support\Icons\Heroicon;
+use Filament\View\PanelsRenderHook;
 use Filament\Widgets\AccountWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -47,11 +48,12 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->navigationItems([
                 NavigationItem::make('site')
-                    ->label(fn () => __('Back to site'))
+                    ->label(fn () => __('Site home'))
                     ->url(fn () => route('home'))
-                    ->icon(Heroicon::OutlinedArrowUturnLeft)
-                    ->sort(100),
+                    ->icon(Heroicon::OutlinedHome)
+                    ->sort(0),
             ])
+            ->renderHook(PanelsRenderHook::GLOBAL_SEARCH_BEFORE, fn () => view('filament.site-home-link'))
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
