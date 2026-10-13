@@ -1,5 +1,9 @@
 * text=auto eol=lf
 
+# cmd.exe needs CRLF line endings in batch files
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
 *.blade.php diff=html
 *.css diff=css
 *.html diff=html

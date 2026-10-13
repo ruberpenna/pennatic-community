@@ -1,9 +1,11 @@
 @echo off
-chcp 65001 >nul
-rem 운영 서버 업데이트: 최신 코드 -> 패키지 -> 프론트 빌드 -> DB 마이그레이션 -> 캐시 -> 서비스 재시작
-rem 관리자 권한 명령 프롬프트에서 실행하세요
+rem Production update: maintenance on -> pull -> packages -> front-end build
+rem -> migrate -> caches -> restart php workers -> maintenance off.
+rem Run from an elevated (administrator) command prompt.
+rem Keep this file ASCII-only with CRLF line endings; cmd.exe misparses UTF-8 text.
+
 cd /d "%~dp0.."
-set PATH=G:\php\php-8.4.26;G:\php;C:\Program Files\nodejs;%PATH%
+set "PATH=G:\php\php-8.4.26;G:\php;C:\Program Files\nodejs;%PATH%"
 
 php artisan down --retry=30 || goto :error
 git pull --ff-only || goto :up_error
@@ -17,12 +19,12 @@ nssm restart penna-php-1 || goto :up_error
 nssm restart penna-php-2 || goto :up_error
 php artisan up || goto :error
 echo.
-echo 업데이트 완료
+echo Update finished.
 exit /b 0
 
 :up_error
 php artisan up
 :error
 echo.
-echo 업데이트 중 오류가 발생했습니다. 위 메시지를 확인하세요.
+echo Update failed. Check the messages above.
 exit /b 1
