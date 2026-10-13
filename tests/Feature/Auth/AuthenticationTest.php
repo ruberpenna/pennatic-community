@@ -23,7 +23,7 @@ class AuthenticationTest extends TestCase
         $user = User::factory()->create();
 
         $response = LivewireVolt::test('auth.login')
-            ->set('email', $user->email)
+            ->set('username', $user->username)
             ->set('password', 'password')
             ->call('login');
 
@@ -38,12 +38,39 @@ class AuthenticationTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->post('/login', [
-            'email' => $user->email,
-            'password' => 'wrong-password',
-        ]);
+        LivewireVolt::test('auth.login')
+            ->set('username', $user->username)
+            ->set('password', 'wrong-password')
+            ->call('login')
+            ->assertHasErrors('username');
 
         $this->assertGuest();
+    }
+
+    public function test_users_can_not_authenticate_with_their_email(): void
+    {
+        $user = User::factory()->create();
+
+        LivewireVolt::test('auth.login')
+            ->set('username', $user->email)
+            ->set('password', 'password')
+            ->call('login')
+            ->assertHasErrors('username');
+
+        $this->assertGuest();
+    }
+
+    public function test_username_is_case_insensitive(): void
+    {
+        $user = User::factory()->create(['username' => 'penna']);
+
+        LivewireVolt::test('auth.login')
+            ->set('username', 'Penna')
+            ->set('password', 'password')
+            ->call('login')
+            ->assertHasNoErrors();
+
+        $this->assertAuthenticatedAs($user);
     }
 
     public function test_users_can_logout(): void
