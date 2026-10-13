@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\Board;
+use App\Models\BoardFolder;
+use App\Models\Post;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +23,30 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        View::composer('components.layouts.app.sidebar', function ($view) {
+            $view->with([
+                'boardFolders' => BoardFolder::with('boards')->orderBy('sort_order')->orderBy('id')->get(),
+                'currentBoardId' => $this->currentBoardId(),
+            ]);
+        });
+    }
+
+    /**
+     * The board the current page belongs to, for highlighting the menu.
+     * Route parameters may still be raw ids on full-page Livewire routes.
+     */
+    private function currentBoardId(): ?int
+    {
+        $route = request()->route();
+        $board = $route?->parameter('board');
+        $post = $route?->parameter('post');
+
+        return match (true) {
+            $board instanceof Board => $board->id,
+            is_numeric($board) => (int) $board,
+            $post instanceof Post => $post->board_id,
+            is_numeric($post) => Post::withTrashed()->whereKey($post)->value('board_id'),
+            default => null,
+        };
     }
 }

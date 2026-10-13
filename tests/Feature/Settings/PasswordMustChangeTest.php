@@ -16,7 +16,7 @@ class PasswordMustChangeTest extends TestCase
         $user = User::factory()->create(['password_must_change' => true]);
 
         $this->actingAs($user)
-            ->get(route('dashboard'))
+            ->get(route('home'))
             ->assertRedirect(route('settings.password'));
 
         $this->actingAs($user)
@@ -54,13 +54,13 @@ class PasswordMustChangeTest extends TestCase
 
         $this->assertFalse($user->refresh()->password_must_change);
 
-        $this->get(route('dashboard'))->assertOk();
+        $this->get(route('home'))->assertOk();
     }
 
     public function test_other_users_are_not_redirected(): void
     {
         $this->actingAs(User::factory()->create())
-            ->get(route('dashboard'))
+            ->get(route('home'))
             ->assertOk();
     }
 }

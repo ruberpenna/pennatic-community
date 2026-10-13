@@ -6,11 +6,11 @@ use App\Models\Board;
 use App\Models\BoardFolder;
 use App\Models\Notice;
 use App\Models\User;
+use App\Support\PostContent;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use Mews\Purifier\Facades\Purifier;
 
 /**
  * Imports data from the pre-Laravel "legacy" connection.
@@ -103,7 +103,7 @@ class LegacyImportSeeder extends Seeder
 
             $notice->forceFill([
                 'user_id' => $adminId,
-                'content' => Purifier::clean($this->extractInlineImages($row->main_content)),
+                'content' => PostContent::clean($this->extractInlineImages($row->main_content)),
                 'updated_at' => $row->main_date,
                 'deleted_at' => (int) $row->main_status === 1 ? null : now(),
             ])->save();

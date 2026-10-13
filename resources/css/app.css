@@ -64,3 +64,39 @@ select:focus[data-flux-control] {
 /* \[:where(&)\]:size-4 {
     @apply size-4;
 } */
+
+/* Rendered post/notice bodies and the Trix editing area share these styles. */
+.post-content {
+    @apply break-words leading-relaxed;
+
+    & h1 { @apply mb-2 text-xl font-semibold; }
+    & h2 { @apply mb-2 text-lg font-semibold; }
+    & h3 { @apply mb-2 font-semibold; }
+    & p, & div { @apply min-h-[1lh]; }
+    & ul { @apply list-disc ps-6; }
+    & ol { @apply list-decimal ps-6; }
+    & blockquote { @apply my-2 border-s-4 border-zinc-300 ps-3 text-zinc-600 dark:border-zinc-600 dark:text-zinc-300; }
+    & pre { @apply my-2 overflow-x-auto rounded bg-zinc-100 p-3 font-mono text-sm dark:bg-zinc-900; }
+    & a { @apply text-blue-600 underline dark:text-blue-400; }
+    & img { @apply my-2 h-auto max-w-full; }
+}
+
+trix-editor.post-content {
+    min-height: 18rem;
+}
+
+.dark trix-toolbar .trix-button-group {
+    @apply border-zinc-600;
+}
+
+.dark trix-toolbar .trix-button {
+    @apply border-zinc-600 bg-zinc-700;
+}
+
+.dark trix-toolbar .trix-button--icon::before {
+    filter: invert(1);
+}
+
+.dark trix-toolbar .trix-button.trix-active {
+    @apply bg-zinc-500;
+}

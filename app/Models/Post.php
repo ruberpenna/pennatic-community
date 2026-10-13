@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Session\Session;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Http\UploadedFile;
 
 class Post extends Model
 {
@@ -32,6 +35,52 @@ class Post extends Model
             'view_count' => 'integer',
             'is_pinned' => 'boolean',
         ];
+    }
+
+    /**
+     * Store an uploaded file privately and attach it to this post.
+     */
+    public function addAttachment(UploadedFile $file): Attachment
+    {
+        return $this->attachments()->create([
+            'original_name' => $file->getClientOriginalName(),
+            'path' => $file->store('attachments', 'local'),
+            'mime_type' => $file->getMimeType(),
+            'size' => $file->getSize(),
+        ]);
+    }
+
+    /**
+     * Count one view per post per session.
+     */
+    public function recordView(Session $session): void
+    {
+        $key = 'viewed_posts.'.$this->id;
+
+        if ($session->has($key)) {
+            return;
+        }
+
+        $session->put($key, true);
+        static::whereKey($this->id)->toBase()->increment('view_count');
+        $this->view_count++;
+    }
+
+    /**
+     * @param  Builder<Post>  $query
+     */
+    public function scopeSearch(Builder $query, string $field, string $term): void
+    {
+        // "!" is the escape character so that % and _ in the term match literally on both MySQL and SQLite.
+        $pattern = '%'.str_replace(['!', '%', '_'], ['!!', '!%', '!_'], $term).'%';
+        $like = fn (Builder $q, string $column, string $boolean = 'and') => $q->whereRaw("{$column} like ? escape '!'", [$pattern], $boolean);
+
+        match ($field) {
+            'content' => $like($query, 'content'),
+            'author' => $query->whereHas('user', fn (Builder $q) => $like($q->withTrashed(), 'name')),
+            'title_content' => $query->where(fn (Builder $q) => $like($like($q, 'title'), 'content', 'or')),
+            default => $like($query, 'title'),
+        };
     }
 
     /**

@@ -1,20 +1,22 @@
 <?php
 
-use App\Models\Notice;
+use App\Http\Controllers\AttachmentController;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
-Route::get('/', function () {
-    return view('welcome', [
-        'notices' => Notice::latest()->limit(5)->get(),
-    ]);
-})->name('home');
+Volt::route('/', 'home')->name('home');
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+// The starter kit sends users to "dashboard" after login; the home page is the community front page.
+Route::redirect('dashboard', '/')->name('dashboard');
+
+Volt::route('boards/{board}', 'boards.show')->name('boards.show');
+Volt::route('posts/{post}', 'posts.show')->whereNumber('post')->name('posts.show');
 
 Route::middleware(['auth'])->group(function () {
+    Volt::route('boards/{board}/write', 'posts.create')->name('posts.create');
+    Volt::route('posts/{post}/edit', 'posts.edit')->whereNumber('post')->name('posts.edit');
+    Route::get('attachments/{attachment}', AttachmentController::class)->name('attachments.download');
+
     Route::redirect('settings', 'settings/profile');
 
     Volt::route('settings/profile', 'settings.profile')->name('settings.profile');
