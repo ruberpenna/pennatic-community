@@ -27,9 +27,10 @@ new class extends Component {
             throw $e;
         }
 
-        Auth::user()->update([
+        Auth::user()->forceFill([
             'password' => Hash::make($validated['password']),
-        ]);
+            'password_must_change' => false,
+        ])->save();
 
         $this->reset('current_password', 'password', 'password_confirmation');
 
@@ -40,7 +41,11 @@ new class extends Component {
 <section class="w-full">
     @include('partials.settings-heading')
 
-    <x-settings.layout heading="Update password" subheading="Ensure your account is using a long, random password to stay secure">
+    <x-settings.layout :heading="__('Update password')" :subheading="__('Ensure your account is using a long, random password to stay secure')">
+        @if (auth()->user()->password_must_change)
+            <flux:callout variant="warning" icon="exclamation-triangle" class="mt-6" :heading="__('Please change your password before continuing.')" />
+        @endif
+
         <form wire:submit="updatePassword" class="mt-6 space-y-6">
             <flux:input
                 wire:model="current_password"

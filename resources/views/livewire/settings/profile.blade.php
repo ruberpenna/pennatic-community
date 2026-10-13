@@ -3,12 +3,18 @@
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Livewire\Volt\Component;
+use Livewire\WithFileUploads;
 
 new class extends Component {
+    use WithFileUploads;
+
     public string $name = '';
     public string $email = '';
+    public string $intro = '';
+    public $avatar = null;
 
     /**
      * Mount the component.
@@ -17,6 +23,7 @@ new class extends Component {
     {
         $this->name = Auth::user()->name;
         $this->email = Auth::user()->email;
+        $this->intro = Auth::user()->intro ?? '';
     }
 
     /**
@@ -37,9 +44,22 @@ new class extends Component {
                 'max:255',
                 Rule::unique(User::class)->ignore($user->id)
             ],
+
+            'intro' => ['nullable', 'string', 'max:300'],
+            'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png,gif,webp', 'max:2048', 'dimensions:max_width=4000,max_height=4000'],
         ]);
 
-        $user->fill($validated);
+        $user->fill([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'intro' => $validated['intro'] ?: null,
+        ]);
+
+        if ($this->avatar) {
+            $this->deleteAvatarFile($user);
+            $user->avatar_path = $this->avatar->store('avatars', 'public');
+            $this->avatar = null;
+        }
 
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
@@ -48,6 +68,26 @@ new class extends Component {
         $user->save();
 
         $this->dispatch('profile-updated', name: $user->name);
+    }
+
+    /**
+     * Remove the current user's profile image.
+     */
+    public function removeAvatar(): void
+    {
+        $user = Auth::user();
+
+        $this->deleteAvatarFile($user);
+        $user->forceFill(['avatar_path' => null])->save();
+
+        $this->dispatch('profile-updated', name: $user->name);
+    }
+
+    private function deleteAvatarFile(User $user): void
+    {
+        if ($user->avatar_path) {
+            Storage::disk('public')->delete($user->avatar_path);
+        }
     }
 
     /**
@@ -72,9 +112,22 @@ new class extends Component {
 <section class="w-full">
     @include('partials.settings-heading')
 
-    <x-settings.layout heading="Profile" subheading="Update your name and email address">
+    <x-settings.layout :heading="__('Profile')" :subheading="__('Update your name and email address')">
         <form wire:submit="updateProfileInformation" class="my-6 w-full space-y-6">
-            <flux:input wire:model="name" label="{{ __('Name') }}" type="text" name="name" required autofocus autocomplete="name" />
+            <div class="flex items-center gap-4">
+                <flux:avatar size="xl" :src="$avatar?->isPreviewable() ? $avatar->temporaryUrl() : auth()->user()->avatarUrl()" :initials="auth()->user()->initials()" />
+
+                <div class="flex flex-col gap-2">
+                    <flux:input type="file" wire:model="avatar" accept="image/jpeg,image/png,image/gif,image/webp" :label="__('Profile image')" />
+                    @if (auth()->user()->avatar_path)
+                        <flux:button size="sm" variant="subtle" wire:click="removeAvatar">{{ __('Remove image') }}</flux:button>
+                    @endif
+                </div>
+            </div>
+
+            <flux:input :value="auth()->user()->username" :label="__('Username')" readonly disabled />
+
+            <flux:input wire:model="name" label="{{ __('Nickname') }}" type="text" name="name" required autofocus autocomplete="nickname" />
 
             <div>
                 <flux:input wire:model="email" label="{{ __('Email') }}" type="email" name="email" required autocomplete="email" />
@@ -100,6 +153,8 @@ new class extends Component {
                     </div>
                 @endif
             </div>
+
+            <flux:textarea wire:model="intro" :label="__('About me')" rows="3" maxlength="300" />
 
             <div class="flex items-center gap-4">
                 <div class="flex items-center justify-end">

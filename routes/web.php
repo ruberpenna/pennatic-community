@@ -1,10 +1,13 @@
 <?php
 
+use App\Models\Notice;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('welcome', [
+        'notices' => Notice::latest()->limit(5)->get(),
+    ]);
 })->name('home');
 
 Route::view('dashboard', 'dashboard')

@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "penna",
+      "runtimeExecutable": "G:/php/php-8.4.26/php.exe",
+      "runtimeArgs": ["artisan", "serve", "--port=8010"],
+      "port": 8010
+    }
+  ]
+}

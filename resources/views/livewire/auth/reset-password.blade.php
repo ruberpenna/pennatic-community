@@ -46,6 +46,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
             function ($user) {
                 $user->forceFill([
                     'password' => Hash::make($this->password),
+                    'password_must_change' => false,
                     'remember_token' => Str::random(60),
                 ])->save();
 
@@ -69,7 +70,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
 }; ?>
 
 <div class="flex flex-col gap-6">
-    <x-auth-header title="Reset password" description="Please enter your new password below" />
+    <x-auth-header :title="__('Reset password')" :description="__('Please enter your new password below')" />
 
     <!-- Session Status -->
     <x-auth-session-status class="text-center" :status="session('status')" />
@@ -90,7 +91,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
                 name="password"
                 required
                 autocomplete="new-password"
-                placeholder="Password"
+                :placeholder="__('Password')"
             />
         </div>
 
@@ -104,7 +105,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
                 name="password_confirmation"
                 required
                 autocomplete="new-password"
-                placeholder="Confirm password"
+                :placeholder="__('Confirm password')"
             />
         </div>
 
