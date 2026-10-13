@@ -77,7 +77,16 @@ new class extends Component {
         <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-zinc-500">
             <span class="flex items-center gap-2">
                 <flux:avatar size="xs" :src="$post->user?->avatarUrl()" :initials="$post->user?->initials() ?? '?'" />
-                <span class="text-zinc-800 dark:text-zinc-200">{{ $post->user?->name ?? __('Unknown') }}</span>
+                @if ($post->user && ! $post->user->trashed() && auth()->id() !== $post->user_id)
+                    <flux:dropdown>
+                        <button type="button" class="text-zinc-800 hover:underline dark:text-zinc-200">{{ $post->user->name }}</button>
+                        <flux:menu>
+                            <flux:menu.item icon="envelope" :href="route('messages.create', ['to' => $post->user->name])" wire:navigate>{{ __('Send message') }}</flux:menu.item>
+                        </flux:menu>
+                    </flux:dropdown>
+                @else
+                    <span class="text-zinc-800 dark:text-zinc-200">{{ $post->user?->name ?? __('Unknown') }}</span>
+                @endif
             </span>
             <time datetime="{{ $post->created_at->toIso8601String() }}">{{ $post->created_at->format('Y.m.d H:i') }}</time>
             <span>{{ __('Views') }} {{ number_format($post->view_count) }}</span>

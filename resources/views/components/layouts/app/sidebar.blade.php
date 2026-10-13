@@ -31,6 +31,21 @@
                         @endforeach
                     </flux:navlist.group>
                 @endforeach
+
+                @auth
+                    <flux:navlist.group :heading="__('My space')" class="mt-4 grid">
+                        <flux:navlist.item
+                            icon="envelope"
+                            :href="route('messages.index')"
+                            :current="request()->routeIs('messages.*')"
+                            :badge="$unreadMessages ?: null"
+                            wire:navigate
+                        >{{ __('Messages') }}</flux:navlist.item>
+                        <flux:navlist.item icon="pencil" :href="route('memos.index')" :current="request()->routeIs('memos.*')" wire:navigate>{{ __('Memos') }}</flux:navlist.item>
+                        <flux:navlist.item icon="calendar-days" :href="route('attendance')" :current="request()->routeIs('attendance')" wire:navigate>{{ __('Attendance') }}</flux:navlist.item>
+                        <flux:navlist.item icon="lifebuoy" :href="route('contact')" :current="request()->routeIs('contact')" wire:navigate>{{ __('Contact the admin') }}</flux:navlist.item>
+                    </flux:navlist.group>
+                @endauth
             </flux:navlist>
 
             <flux:spacer />

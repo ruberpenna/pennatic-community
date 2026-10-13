@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\Board;
 use App\Models\BoardFolder;
+use App\Models\Message;
 use App\Models\Post;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -27,6 +28,9 @@ class AppServiceProvider extends ServiceProvider
             $view->with([
                 'boardFolders' => BoardFolder::with('boards')->orderBy('sort_order')->orderBy('id')->get(),
                 'currentBoardId' => $this->currentBoardId(),
+                'unreadMessages' => auth()->check()
+                    ? Message::inboxOf(auth()->user())->whereNull('read_at')->count()
+                    : 0,
             ]);
         });
     }

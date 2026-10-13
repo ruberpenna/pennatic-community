@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasVotes;
+use App\Support\Like;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -72,15 +73,11 @@ class Post extends Model
      */
     public function scopeSearch(Builder $query, string $field, string $term): void
     {
-        // "!" is the escape character so that % and _ in the term match literally on both MySQL and SQLite.
-        $pattern = '%'.str_replace(['!', '%', '_'], ['!!', '!%', '!_'], $term).'%';
-        $like = fn (Builder $q, string $column, string $boolean = 'and') => $q->whereRaw("{$column} like ? escape '!'", [$pattern], $boolean);
-
         match ($field) {
-            'content' => $like($query, 'content'),
-            'author' => $query->whereHas('user', fn (Builder $q) => $like($q->withTrashed(), 'name')),
-            'title_content' => $query->where(fn (Builder $q) => $like($like($q, 'title'), 'content', 'or')),
-            default => $like($query, 'title'),
+            'content' => Like::where($query, 'content', $term),
+            'author' => $query->whereHas('user', fn (Builder $q) => Like::where($q->withTrashed(), 'name', $term)),
+            'title_content' => $query->where(fn (Builder $q) => Like::where(Like::where($q, 'title', $term), 'content', $term, 'or')),
+            default => Like::where($query, 'title', $term),
         };
     }
 

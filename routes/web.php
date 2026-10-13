@@ -20,6 +20,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('attachments/{attachment}', AttachmentController::class)->name('attachments.download');
     Volt::route('my/activity', 'my.activity')->name('my.activity');
 
+    Volt::route('messages', 'messages.index')->name('messages.index');
+    Volt::route('messages/new', 'messages.create')->name('messages.create');
+    Volt::route('messages/{message}', 'messages.show')->whereNumber('message')->name('messages.show');
+    Volt::route('memos', 'memos.index')->name('memos.index');
+    Volt::route('attendance', 'attendance')->name('attendance');
+    Volt::route('contact', 'contact')->name('contact');
+
     Route::redirect('settings', 'settings/profile');
 
     Volt::route('settings/profile', 'settings.profile')->name('settings.profile');
