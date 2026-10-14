@@ -19,6 +19,12 @@ class BoardFolder extends Model
         'sort_order',
     ];
 
+    protected static function booted(): void
+    {
+        // Boards are removed by the foreign key cascade, which skips model events; purge their deleted posts first.
+        static::deleting(fn (BoardFolder $folder) => $folder->boards->each->purgeDeletedPosts());
+    }
+
     /**
      * @return HasMany<Board, $this>
      */

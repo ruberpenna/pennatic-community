@@ -49,6 +49,19 @@ class Board extends Model
 
     public const PRIVATE_ICON = 'lock-closed';
 
+    protected static function booted(): void
+    {
+        // Posts restrict board deletion at the database level. Admins may delete a board once it has
+        // no visible posts; soft-deleted leftovers (with their comments and files) go with it.
+        static::deleting(fn (Board $board) => $board->purgeDeletedPosts());
+    }
+
+    public function purgeDeletedPosts(): void
+    {
+        // forceDelete per post so attachment files are removed too (see Post::booted).
+        $this->posts()->onlyTrashed()->get()->each->forceDelete();
+    }
+
     public function menuIcon(): string
     {
         if ($this->is_private) {

@@ -5,6 +5,7 @@
     "2FA recovery codes": "2FA 복구 코드",
     ":action to join the \":team\" team.": ":action to join the \":team\" team.",
     ":count day|:count days": ":count일",
+    ":count deleted post(s) will be permanently removed too.": "삭제 처리된 글 :count개(댓글·첨부파일 포함)도 함께 영구 삭제됩니다.",
     ":count joined today": "오늘 :count명 가입",
     ":count member|:count members": ":count명",
     ":count written today": "오늘 :count개 작성",

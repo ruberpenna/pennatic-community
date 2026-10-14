@@ -10,6 +10,7 @@ use App\Filament\Resources\Users\Pages\EditUser;
 use App\Filament\Resources\Users\Pages\ListUsers;
 use App\Models\Board;
 use App\Models\BoardFolder;
+use App\Models\Comment;
 use App\Models\Notice;
 use App\Models\Post;
 use App\Models\User;
@@ -134,6 +135,46 @@ class AdminPanelTest extends TestCase
 
         Livewire::test(BoardsRelationManager::class, ['ownerRecord' => $folder, 'pageClass' => EditBoardFolder::class])
             ->assertTableActionDisabled('delete', $board);
+    }
+
+    public function test_board_with_only_deleted_posts_can_be_deleted_and_they_are_purged(): void
+    {
+        Storage::fake('local');
+        $folder = BoardFolder::factory()->create();
+        $board = Board::factory()->for($folder, 'folder')->create();
+        $post = Post::factory()->for($board)->create();
+        $comment = Comment::factory()->for($post)->create();
+        $attachment = $post->addAttachment(UploadedFile::fake()->create('a.txt', 1, 'text/plain'));
+        $post->delete();
+
+        $this->actingAs($this->admin);
+
+        Livewire::test(BoardsRelationManager::class, ['ownerRecord' => $folder, 'pageClass' => EditBoardFolder::class])
+            ->assertTableActionEnabled('delete', $board)
+            ->callTableAction('delete', $board);
+
+        $this->assertModelMissing($board);
+        $this->assertModelMissing($post);
+        $this->assertModelMissing($comment);
+        $this->assertModelMissing($attachment);
+        Storage::disk('local')->assertMissing($attachment->path);
+    }
+
+    public function test_folder_whose_boards_only_have_deleted_posts_can_be_deleted(): void
+    {
+        $folder = BoardFolder::factory()->create();
+        $board = Board::factory()->for($folder, 'folder')->create();
+        $post = Post::factory()->for($board)->create();
+        $post->delete();
+
+        $this->actingAs($this->admin);
+
+        Livewire::test(EditBoardFolder::class, ['record' => $folder->getRouteKey()])
+            ->callAction('delete');
+
+        $this->assertModelMissing($folder);
+        $this->assertModelMissing($board);
+        $this->assertModelMissing($post);
     }
 
     public function test_board_icon_is_chosen_from_the_allowed_set(): void

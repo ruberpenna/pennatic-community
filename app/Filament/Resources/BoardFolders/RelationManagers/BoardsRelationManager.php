@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\BoardFolders\RelationManagers;
 
+use App\Filament\Resources\BoardFolders\BoardFolderResource;
 use App\Models\Board;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -94,8 +95,9 @@ class BoardsRelationManager extends RelationManager
             ->recordActions([
                 EditAction::make(),
                 DeleteAction::make()
-                    ->disabled(fn (Board $record) => $record->posts()->withTrashed()->exists())
-                    ->tooltip(fn (Board $record) => $record->posts()->withTrashed()->exists() ? __('Boards with posts cannot be deleted.') : null),
+                    ->disabled(fn (Board $record) => $record->posts()->exists())
+                    ->tooltip(fn (Board $record) => $record->posts()->exists() ? __('Boards with posts cannot be deleted.') : null)
+                    ->modalDescription(fn (Board $record) => BoardFolderResource::deletedPostsNote($record->posts()->onlyTrashed()->count())),
             ]);
     }
 }

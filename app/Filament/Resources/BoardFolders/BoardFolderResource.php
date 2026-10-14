@@ -62,10 +62,15 @@ class BoardFolderResource extends Resource
     }
 
     /**
-     * Posts restrict board deletion, so a folder can only go once its boards have no posts.
+     * A folder can only be deleted once its boards have no visible posts (deleted ones are purged with it).
      */
     public static function hasPosts(BoardFolder $folder): bool
     {
-        return $folder->boards()->whereHas('posts', fn ($query) => $query->withTrashed())->exists();
+        return $folder->boards()->whereHas('posts')->exists();
+    }
+
+    public static function deletedPostsNote(int $count): ?string
+    {
+        return $count > 0 ? __(':count deleted post(s) will be permanently removed too.', ['count' => $count]) : null;
     }
 }
