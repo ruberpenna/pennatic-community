@@ -6,8 +6,12 @@
             {{ $number }}
         @endif
     </td>
-    <td class="py-2">
-        <a href="{{ route('posts.show', $post) }}" class="hover:underline" wire:navigate>
+    <td class="py-2 pe-2">
+        <a href="{{ route('posts.show', $post) }}" class="break-words hover:underline" wire:navigate>
+            @if ($post->is_pinned)
+                {{-- The number column (with the pinned badge) is hidden on phones. --}}
+                <flux:badge size="sm" color="amber" class="sm:hidden">{{ __('Pinned') }}</flux:badge>
+            @endif
             @if ($post->subject)
                 <span class="text-zinc-500">[{{ $post->subject }}]</span>
             @endif
@@ -17,10 +21,15 @@
             @endif
         </a>
     </td>
-    <td class="truncate py-2">{{ $post->user?->name ?? __('Unknown') }}</td>
-    <td class="py-2 text-center text-zinc-500">
+    <td class="truncate py-2 max-sm:text-xs">{{ $post->user?->name ?? __('Unknown') }}</td>
+    <td class="py-2 text-center text-zinc-500 max-sm:text-xs">
         <time datetime="{{ $post->created_at->toIso8601String() }}">
-            {{ $post->created_at->isToday() ? $post->created_at->format('H:i') : $post->created_at->format('y.m.d') }}
+            @if ($post->created_at->isToday())
+                {{ $post->created_at->format('H:i') }}
+            @else
+                <span class="sm:hidden">{{ $post->created_at->format('m.d') }}</span>
+                <span class="max-sm:hidden">{{ $post->created_at->format('y.m.d') }}</span>
+            @endif
         </time>
     </td>
     <td class="py-2 text-center text-zinc-500 max-sm:hidden">{{ number_format($post->view_count) }}</td>

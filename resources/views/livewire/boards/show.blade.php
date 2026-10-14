@@ -98,13 +98,14 @@ new class extends Component {
     @endif
 
     <div class="overflow-x-auto">
-        <table class="w-full text-sm">
+        <table class="w-full table-fixed text-sm">
             <thead class="border-b border-zinc-200 text-zinc-500 dark:border-zinc-700">
                 <tr>
                     <th class="w-16 py-2 text-center font-normal max-sm:hidden">{{ __('No.') }}</th>
                     <th class="py-2 text-left font-normal">{{ __('Title') }}</th>
-                    <th class="w-32 py-2 text-left font-normal">{{ __('Author') }}</th>
-                    <th class="w-24 py-2 text-center font-normal">{{ __('Date') }}</th>
+                    {{-- Narrow author/date columns on phones so the title gets the width. --}}
+                    <th class="w-16 py-2 text-left font-normal sm:w-32">{{ __('Author') }}</th>
+                    <th class="w-12 py-2 text-center font-normal sm:w-24">{{ __('Date') }}</th>
                     <th class="w-16 py-2 text-center font-normal max-sm:hidden">{{ __('Views') }}</th>
                     <th class="w-16 py-2 text-center font-normal max-sm:hidden">{{ __('Likes') }}</th>
                 </tr>
