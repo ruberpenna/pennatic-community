@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Support\FeedReader;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Sleep;
 use Tests\TestCase;
 
 class NewsFeedTest extends TestCase
@@ -127,6 +128,49 @@ class NewsFeedTest extends TestCase
 
         $this->assertNotNull($daily->refresh()->last_fetched_at);
         $this->assertFalse($hourly->refresh()->last_fetched_at->isSameMinute(now()));
+    }
+
+    public function test_shop_link_is_taken_from_the_post_page(): void
+    {
+        Sleep::fake();
+        $rss = '<?xml version="1.0"?><rss version="2.0"><channel>'
+            .'<item><title>[토스] 콜라 24캔</title><link>https://bbs.example.test/read/1</link><description><![CDATA[<img src="https://i.example.test/a.webp">]]></description></item>'
+            .'<item><title>[쿠팡] 라면</title><link>https://bbs.example.test/read/2</link></item>'
+            .'<item><title>[11번가] 깨진 글</title><link>https://bbs.example.test/read/3</link></item>'
+            .'</channel></rss>';
+        $page = fn (string $href) => '<html><body><div class="view_bottom"><div class="source_url box_line_with_shadow">출처 : <a href="'.$href.'">'.$href.'</a></div></div></body></html>';
+
+        Http::fake([
+            'feeds.example.test/*' => Http::response($rss),
+            'bbs.example.test/read/1' => Http::response($page('https://toss.shopping/t/123')),
+            // A link back to the community itself is not a shop link.
+            'bbs.example.test/read/2' => Http::response($page('https://bbs.example.test/other')),
+            'bbs.example.test/read/3' => Http::response('', 500),
+        ]);
+
+        $source = FeedSource::factory()->create(['url' => 'https://feeds.example.test/deals.xml', 'name' => '루리웹 핫딜', 'shop_link_parser' => 'ruliweb']);
+
+        $this->artisan('news:fetch')->assertSuccessful();
+
+        $posts = Post::where('board_id', $source->board_id)->get()->keyBy('title');
+        $this->assertCount(3, $posts);
+        $this->assertStringContainsString('href="https://toss.shopping/t/123"', $posts['[토스] 콜라 24캔']->content);
+        $this->assertStringContainsString('쇼핑몰 바로가기', $posts['[토스] 콜라 24캔']->content);
+        $this->assertStringNotContainsString('쇼핑몰 바로가기', $posts['[쿠팡] 라면']->content);
+        // A page that fails to load still produces the post, just without the shop link.
+        $this->assertStringContainsString('원문 보기 · 루리웹 핫딜', $posts['[11번가] 깨진 글']->content);
+
+        Sleep::assertSleptTimes(2);
+    }
+
+    public function test_sources_without_a_parser_never_read_item_pages(): void
+    {
+        Http::fake(['*' => Http::response(self::RSS)]);
+        FeedSource::factory()->create(['url' => 'https://news.example.test/rss.xml']);
+
+        $this->artisan('news:fetch')->assertSuccessful();
+
+        Http::assertSentCount(1);
     }
 
     public function test_inactive_sources_are_skipped_and_errors_are_recorded(): void

@@ -24,6 +24,7 @@ class FeedSource extends Model
         'is_active',
         'max_items',
         'fetch_interval_hours',
+        'shop_link_parser',
     ];
 
     /** Choices for fetch_interval_hours; null means once a day at 07:00. */

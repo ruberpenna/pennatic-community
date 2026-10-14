@@ -4,6 +4,7 @@ namespace App\Filament\Resources\FeedSources\Schemas;
 
 use App\Models\Board;
 use App\Models\FeedSource;
+use App\Support\ShopLink;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -47,6 +48,11 @@ class FeedSourceForm
                     ->options(collect(FeedSource::INTERVALS)->mapWithKeys(fn (int $hours) => [$hours => __('Every :hours hour(s)', ['hours' => $hours])]))
                     ->placeholder(__('Daily at 07:00'))
                     ->helperText(__('Use a short interval for fast-moving sources such as hot deals.')),
+                Select::make('shop_link_parser')
+                    ->label(__('Shop link'))
+                    ->options(ShopLink::options())
+                    ->placeholder(__('Do not fetch'))
+                    ->helperText(__('For hot-deal sources: reads each new post page and adds a link to the seller. Only sites whose pages allow it are listed.')),
                 Toggle::make('is_active')
                     ->label(__('Active'))
                     ->default(true),

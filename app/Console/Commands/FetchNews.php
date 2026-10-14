@@ -7,10 +7,12 @@ use App\Models\Post;
 use App\Models\User;
 use App\Support\FeedReader;
 use App\Support\PostContent;
+use App\Support\ShopLink;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 
 /**
@@ -30,6 +32,9 @@ class FetchNews extends Command
     public const BOT_USERNAME = 'newsbot';
 
     public const SUMMARY_LENGTH = 300;
+
+    /** Pause between item pages read for shop links. */
+    public const PAGE_DELAY_MS = 1500;
 
     public function handle(): int
     {
@@ -67,6 +72,7 @@ class FetchNews extends Command
 
         $items = array_slice(FeedReader::parse($response->body()), 0, $source->max_items);
         $posted = 0;
+        $pagesRead = 0;
 
         $this->ensureBoardSubject($source);
 
@@ -78,11 +84,27 @@ class FetchNews extends Command
                 continue;
             }
 
-            DB::transaction(function () use ($source, $bot, $item, $hash) {
+            $shopLink = null;
+
+            if ($source->shop_link_parser) {
+                // Read pages one at a time with a pause, to stay gentle on the source site.
+                if ($pagesRead++ > 0) {
+                    Sleep::for(self::PAGE_DELAY_MS)->milliseconds();
+                }
+
+                try {
+                    $shopLink = ShopLink::find($source->shop_link_parser, $item['link']);
+                } catch (\Throwable $e) {
+                    // Post without the shop link rather than skipping the deal.
+                    report($e);
+                }
+            }
+
+            DB::transaction(function () use ($source, $bot, $item, $hash, $shopLink) {
                 $post = new Post([
                     'subject' => $source->subject ?: null,
                     'title' => Str::limit($item['title'], 100, '…'),
-                    'content' => self::content($item, $source->name),
+                    'content' => self::content($item, $source->name, $shopLink),
                 ]);
                 $post->board()->associate($source->board);
                 $post->user()->associate($bot);
@@ -113,11 +135,12 @@ class FetchNews extends Command
     /**
      * @param  array{summary: string, link: string}  $item
      */
-    public static function content(array $item, string $sourceName): string
+    public static function content(array $item, string $sourceName, ?string $shopLink = null): string
     {
         $summary = Str::limit($item['summary'], self::SUMMARY_LENGTH, '…');
 
         $html = ($summary !== '' ? '<div>'.e($summary).'</div><div><br></div>' : '')
+            .($shopLink ? '<div><a href="'.e($shopLink).'">🛒 '.e(__('Go to the shop')).'</a></div>' : '')
             .'<div><a href="'.e($item['link']).'">'.e(__('Read the original').' · '.$sourceName).'</a></div>';
 
         return PostContent::clean($html);
