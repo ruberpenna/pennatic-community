@@ -28,6 +28,10 @@ class FeedSourcesTable
                     ->label(__('Subject'))
                     ->badge()
                     ->placeholder('-'),
+                TextColumn::make('fetch_interval_hours')
+                    ->label(__('Fetch interval'))
+                    ->formatStateUsing(fn (?int $state) => $state ? __('Every :hours hour(s)', ['hours' => $state]) : __('Daily at 07:00'))
+                    ->placeholder(__('Daily at 07:00')),
                 TextColumn::make('items_count')
                     ->label(__('Posted'))
                     ->counts('items'),

@@ -21,7 +21,9 @@ use Illuminate\Support\Str;
  */
 class FetchNews extends Command
 {
-    protected $signature = 'news:fetch {--source= : Only this feed source id}';
+    protected $signature = 'news:fetch
+        {--source= : Only this feed source id}
+        {--frequent : Sources with a fetch interval whose interval has passed (instead of the daily ones)}';
 
     protected $description = 'Post new RSS/Atom items to their boards';
 
@@ -31,9 +33,11 @@ class FetchNews extends Command
 
     public function handle(): int
     {
-        $sources = FeedSource::with('board')
-            ->when($this->option('source'), fn ($query, $id) => $query->whereKey($id), fn ($query) => $query->where('is_active', true))
-            ->get();
+        $sources = match (true) {
+            (bool) $this->option('source') => FeedSource::with('board')->whereKey($this->option('source'))->get(),
+            (bool) $this->option('frequent') => FeedSource::with('board')->frequent()->get()->filter->isDue(),
+            default => FeedSource::with('board')->daily()->get(),
+        };
 
         $bot = self::bot();
         $failed = 0;

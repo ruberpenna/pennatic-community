@@ -103,6 +103,32 @@ class NewsFeedTest extends TestCase
         $this->assertSame([null], Post::pluck('subject')->unique()->values()->all());
     }
 
+    public function test_daily_and_frequent_sources_run_on_their_own_schedule(): void
+    {
+        Http::fake(['*' => Http::response(self::RSS)]);
+        $this->travelTo(now()->setTime(10, 5));
+
+        $daily = FeedSource::factory()->create();
+        $hourly = FeedSource::factory()->create(['fetch_interval_hours' => 1, 'last_fetched_at' => now()->subMinutes(58)]);
+        $sixHours = FeedSource::factory()->create(['fetch_interval_hours' => 6, 'last_fetched_at' => now()->subHours(2)]);
+        $never = FeedSource::factory()->create(['fetch_interval_hours' => 3]);
+
+        // Hourly tick: only due frequent sources (58 min ago counts thanks to the slack; never-fetched is due).
+        $this->artisan('news:fetch --frequent')->assertSuccessful();
+
+        $this->assertNull($daily->refresh()->last_fetched_at);
+        $this->assertTrue($hourly->refresh()->last_fetched_at->isSameMinute(now()));
+        $this->assertFalse($sixHours->refresh()->last_fetched_at->isSameMinute(now()));
+        $this->assertNotNull($never->refresh()->last_fetched_at);
+
+        // Daily run: only sources without an interval.
+        $this->travel(1)->minutes();
+        $this->artisan('news:fetch')->assertSuccessful();
+
+        $this->assertNotNull($daily->refresh()->last_fetched_at);
+        $this->assertFalse($hourly->refresh()->last_fetched_at->isSameMinute(now()));
+    }
+
     public function test_inactive_sources_are_skipped_and_errors_are_recorded(): void
     {
         Http::fake([

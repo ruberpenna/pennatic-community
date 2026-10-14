@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\FeedSources\Schemas;
 
 use App\Models\Board;
+use App\Models\FeedSource;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -41,6 +42,11 @@ class FeedSourceForm
                     ->maxValue(50)
                     ->default(15)
                     ->required(),
+                Select::make('fetch_interval_hours')
+                    ->label(__('Fetch interval'))
+                    ->options(collect(FeedSource::INTERVALS)->mapWithKeys(fn (int $hours) => [$hours => __('Every :hours hour(s)', ['hours' => $hours])]))
+                    ->placeholder(__('Daily at 07:00'))
+                    ->helperText(__('Use a short interval for fast-moving sources such as hot deals.')),
                 Toggle::make('is_active')
                     ->label(__('Active'))
                     ->default(true),
