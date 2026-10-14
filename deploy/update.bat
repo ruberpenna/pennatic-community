@@ -16,8 +16,8 @@ php artisan migrate --force || goto :up_error
 php artisan posts:prune-images || goto :up_error
 php artisan optimize || goto :up_error
 php artisan filament:optimize || goto :up_error
-nssm restart penna-php-1 || goto :up_error
-nssm restart penna-php-2 || goto :up_error
+rem Restart-Service waits until each worker is running (nssm restart can report START_PENDING as a failure).
+powershell -NoProfile -Command "Restart-Service penna-php-1, penna-php-2 -ErrorAction Stop" || goto :up_error
 php artisan up || goto :error
 echo.
 echo Update finished.
