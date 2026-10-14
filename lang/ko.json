@@ -29,6 +29,7 @@
     "Add a passkey to sign in without a password": "Add a passkey to sign in without a password",
     "Add passkey": "Add passkey",
     "Added :time": "Added :time",
+    "Added to every post from this source, e.g. \"Economy\". It is also added to the board's subject filter. Leave empty for none.": "이 소스에서 올라오는 모든 글에 붙는 말머리입니다. 예: \"경제\". 게시판 말머리 필터에도 자동으로 추가됩니다. 비워 두면 붙이지 않습니다.",
     "Admin": "관리자",
     "Agree": "동의하기",
     "All": "전체",

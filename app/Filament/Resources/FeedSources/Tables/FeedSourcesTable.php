@@ -24,6 +24,10 @@ class FeedSourcesTable
                     ->description(fn (FeedSource $record) => $record->url),
                 TextColumn::make('board.name')
                     ->label(__('Board')),
+                TextColumn::make('subject')
+                    ->label(__('Subject'))
+                    ->badge()
+                    ->placeholder('-'),
                 TextColumn::make('items_count')
                     ->label(__('Posted'))
                     ->counts('items'),

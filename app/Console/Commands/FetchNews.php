@@ -64,6 +64,8 @@ class FetchNews extends Command
         $items = array_slice(FeedReader::parse($response->body()), 0, $source->max_items);
         $posted = 0;
 
+        $this->ensureBoardSubject($source);
+
         // Oldest first, so newer stories get higher post numbers.
         foreach (array_reverse($items) as $item) {
             $hash = hash('sha256', $item['guid']);
@@ -74,6 +76,7 @@ class FetchNews extends Command
 
             DB::transaction(function () use ($source, $bot, $item, $hash) {
                 $post = new Post([
+                    'subject' => $source->subject ?: null,
                     'title' => Str::limit($item['title'], 100, '…'),
                     'content' => self::content($item, $source->name),
                 ]);
@@ -88,6 +91,19 @@ class FetchNews extends Command
         }
 
         return $posted;
+    }
+
+    /**
+     * Add the source's subject to the board's subject list so the board's subject filter shows it.
+     */
+    private function ensureBoardSubject(FeedSource $source): void
+    {
+        $subject = $source->subject;
+        $subjects = $source->board->subjects ?? [];
+
+        if ($subject && ! in_array($subject, $subjects, true)) {
+            $source->board->update(['subjects' => [...$subjects, $subject]]);
+        }
     }
 
     /**

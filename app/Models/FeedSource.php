@@ -18,6 +18,7 @@ class FeedSource extends Model
     protected $fillable = [
         'board_id',
         'name',
+        'subject',
         'url',
         'is_active',
         'max_items',

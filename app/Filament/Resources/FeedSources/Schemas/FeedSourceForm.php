@@ -19,6 +19,10 @@ class FeedSourceForm
                     ->helperText(__('Shown in the link under each post, e.g. "SBS headlines".'))
                     ->required()
                     ->maxLength(50),
+                TextInput::make('subject')
+                    ->label(__('Subject'))
+                    ->helperText(__('Added to every post from this source, e.g. "Economy". It is also added to the board\'s subject filter. Leave empty for none.'))
+                    ->maxLength(30),
                 TextInput::make('url')
                     ->label(__('RSS/Atom address'))
                     ->url()

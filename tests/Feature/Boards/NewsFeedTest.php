@@ -79,6 +79,30 @@ class NewsFeedTest extends TestCase
         $this->assertNull($source->last_error);
     }
 
+    public function test_source_subject_is_added_to_posts_and_the_board_filter(): void
+    {
+        Http::fake(['*' => Http::response(self::RSS)]);
+        $source = FeedSource::factory()->create(['subject' => '경제']);
+        $source->board->update(['subjects' => ['헤드라인']]);
+
+        $this->artisan('news:fetch')->assertSuccessful();
+        $this->artisan('news:fetch')->assertSuccessful();
+
+        $this->assertSame(['헤드라인', '경제'], $source->board->refresh()->subjects);
+        $this->assertSame(['경제'], Post::where('board_id', $source->board_id)->pluck('subject')->unique()->values()->all());
+    }
+
+    public function test_source_without_subject_posts_without_one(): void
+    {
+        Http::fake(['*' => Http::response(self::RSS)]);
+        $source = FeedSource::factory()->create(['subject' => null]);
+
+        $this->artisan('news:fetch')->assertSuccessful();
+
+        $this->assertNull($source->board->refresh()->subjects);
+        $this->assertSame([null], Post::pluck('subject')->unique()->values()->all());
+    }
+
     public function test_inactive_sources_are_skipped_and_errors_are_recorded(): void
     {
         Http::fake([
