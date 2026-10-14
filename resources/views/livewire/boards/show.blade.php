@@ -101,13 +101,16 @@ new class extends Component {
         <table class="w-full table-fixed text-sm">
             <thead class="border-b border-zinc-200 text-zinc-500 dark:border-zinc-700">
                 <tr>
-                    <th class="w-16 py-2 text-center font-normal max-sm:hidden">{{ __('No.') }}</th>
+                    {{--
+                        Column widths by screen: phones (< sm) show title/author/date only; foldables and
+                        tablets (sm..lg) add the number with compact author/date; desktop (lg+) shows everything.
+                    --}}
+                    <th class="w-12 py-2 text-center font-normal max-sm:hidden lg:w-16">{{ __('No.') }}</th>
                     <th class="py-2 text-left font-normal">{{ __('Title') }}</th>
-                    {{-- Narrow author/date columns on phones so the title gets the width. --}}
-                    <th class="w-16 py-2 text-left font-normal sm:w-32">{{ __('Author') }}</th>
-                    <th class="w-12 py-2 text-center font-normal sm:w-24">{{ __('Date') }}</th>
-                    <th class="w-16 py-2 text-center font-normal max-sm:hidden">{{ __('Views') }}</th>
-                    <th class="w-16 py-2 text-center font-normal max-sm:hidden">{{ __('Likes') }}</th>
+                    <th class="w-16 py-2 text-left font-normal sm:w-20 lg:w-32">{{ __('Author') }}</th>
+                    <th class="w-12 py-2 text-center font-normal sm:w-16 lg:w-24">{{ __('Date') }}</th>
+                    <th class="w-16 py-2 text-center font-normal max-lg:hidden">{{ __('Views') }}</th>
+                    <th class="w-16 py-2 text-center font-normal max-lg:hidden">{{ __('Likes') }}</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700">

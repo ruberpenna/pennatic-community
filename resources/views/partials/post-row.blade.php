@@ -21,17 +21,17 @@
             @endif
         </a>
     </td>
-    <td class="truncate py-2 max-sm:text-xs">{{ $post->user?->name ?? __('Unknown') }}</td>
-    <td class="py-2 text-center text-zinc-500 max-sm:text-xs">
+    <td class="truncate py-2 max-lg:text-xs">{{ $post->user?->name ?? __('Unknown') }}</td>
+    <td class="py-2 text-center text-zinc-500 max-lg:text-xs">
         <time datetime="{{ $post->created_at->toIso8601String() }}">
             @if ($post->created_at->isToday())
                 {{ $post->created_at->format('H:i') }}
             @else
-                <span class="sm:hidden">{{ $post->created_at->format('m.d') }}</span>
-                <span class="max-sm:hidden">{{ $post->created_at->format('y.m.d') }}</span>
+                <span class="lg:hidden">{{ $post->created_at->format('m.d') }}</span>
+                <span class="max-lg:hidden">{{ $post->created_at->format('y.m.d') }}</span>
             @endif
         </time>
     </td>
-    <td class="py-2 text-center text-zinc-500 max-sm:hidden">{{ number_format($post->view_count) }}</td>
-    <td class="py-2 text-center text-zinc-500 max-sm:hidden">{{ $post->upvotes_count ?? 0 }}</td>
+    <td class="py-2 text-center text-zinc-500 max-lg:hidden">{{ number_format($post->view_count) }}</td>
+    <td class="py-2 text-center text-zinc-500 max-lg:hidden">{{ $post->upvotes_count ?? 0 }}</td>
 </tr>
