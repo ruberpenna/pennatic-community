@@ -463,6 +463,7 @@
     "Show :name": ":name 보기",
     "Show All": "모두 보기",
     "Showing": "보기",
+    ":total items · :first–:last": "전체 :total개 · :first–:last",
     "Shown in the link under each post, e.g. \"SBS headlines\".": "글 아래 원문 링크에 표시됩니다. 예: \"SBS 헤드라인\"",
     "Shown next to the board name in the menu, and alone when the menu is collapsed.": "메뉴에서 게시판 이름 왼쪽에 보이고, 메뉴를 접으면 이 아이콘만 남습니다.",
     "Sign In": "로그인",
