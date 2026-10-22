@@ -5,7 +5,7 @@ rem Run from an elevated (administrator) command prompt.
 rem Keep this file ASCII-only with CRLF line endings; cmd.exe misparses UTF-8 text.
 
 cd /d "%~dp0.."
-set "PATH=G:\php\php-8.4.26;G:\php;C:\Program Files\nodejs;%PATH%"
+set "PATH=G:\php\php-8.4.27;G:\php;C:\Program Files\nodejs;%PATH%"
 
 php artisan down --retry=30 || goto :error
 git pull --ff-only || goto :up_error

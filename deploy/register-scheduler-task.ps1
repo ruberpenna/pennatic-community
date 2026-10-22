@@ -3,7 +3,7 @@
 # Runs as SYSTEM so it works without anyone logged in. Re-running replaces the existing task.
 param(
     [string]$AppDir = (Split-Path $PSScriptRoot -Parent),
-    [string]$Php = 'G:\php\php-8.4.26\php.exe'
+    [string]$Php = 'G:\php\php-8.4.27\php.exe'
 )
 $ErrorActionPreference = 'Stop'
 

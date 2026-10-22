@@ -6,7 +6,7 @@ param(
     [int]$KeepDays = 30,                               # older DB dumps are deleted (the newest 7 are always kept)
     # Second copy (OneDrive: another disk, synced to the cloud). Empty to skip. A failure here does not fail the backup.
     [string]$MirrorDir = 'D:\OneDrive\DEV\penna_backup\auto',
-    [string]$Php = 'G:\php\php-8.4.26\php.exe'
+    [string]$Php = 'G:\php\php-8.4.27\php.exe'
 )
 
 $ErrorActionPreference = 'Stop'

@@ -12,7 +12,7 @@
 |---|---|
 | 운영 코드 | `G:\penna` (GitHub `ruberpenna/pennatic-community`의 clone) |
 | 개발 코드 | `G:\pennticComm` |
-| PHP / Composer | `G:\php\php-8.4.26`, `G:\php\composer.bat` |
+| PHP / Composer | `G:\php\php-8.4.27`, `G:\php\composer.bat` |
 | nginx | `G:\nginx\nginx-1.29.1` (설정은 `deploy\nginx.conf`가 복사됨, 원본은 `conf\nginx.conf.orig`) |
 | 서비스 | `penna-php-1`, `penna-php-2`, `penna-nginx` (NSSM, 자동 시작) |
 | 로그 | `G:\penna\storage\logs` (앱), `storage\logs\services` (서비스), `G:\nginx\nginx-1.29.1\logs` |

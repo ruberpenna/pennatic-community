@@ -5,7 +5,7 @@
 
 param(
     [string]$AppDir = 'G:\penna',
-    [string]$PhpDir = 'G:\php\php-8.4.26',
+    [string]$PhpDir = 'G:\php\php-8.4.27',
     [string]$NginxDir = 'G:\nginx\nginx-1.29.1',
     [string]$ProxyIp = '192.168.0.33',
     [int]$Port = 8765
