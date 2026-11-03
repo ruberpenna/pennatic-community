@@ -38,7 +38,11 @@ function Install-PennaService([string]$Name, [string]$Exe, [string]$Arguments, [
     & $nssm set $Name AppStderr (Join-Path $logDir "$Name.log") | Out-Null
     & $nssm set $Name AppRotateFiles 1 | Out-Null
     & $nssm set $Name AppRotateBytes 10485760 | Out-Null
-    & $nssm set $Name Start SERVICE_AUTO_START | Out-Null
+    # G: is a USB drive that can mount after services start at boot: start delayed, and retry
+    # after 60 s if the service still fails (also on error exits, not only crashes).
+    & $nssm set $Name Start SERVICE_DELAYED_AUTO_START | Out-Null
+    sc.exe failure $Name reset= 86400 actions= restart/60000/restart/60000/restart/60000 | Out-Null
+    sc.exe failureflag $Name 1 | Out-Null
     if ($Environment.Count) {
         & $nssm set $Name AppEnvironmentExtra @Environment | Out-Null
     }
